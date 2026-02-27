@@ -22,22 +22,31 @@ class MyApp extends StatelessWidget {
         ///This deletes and re-creates the database each time
         ///The final version won't do this, but it's useful for
         ///now since we will be constantly updating how the db is built.
-        db.execute('DROP TABLE IF EXISTS pokemon_test');
+        db.execute('DROP TABLE IF EXISTS expanded_pokemon_test');
       },
       onOpen: (db) async {
         await db.execute('''
-          CREATE TABLE pokemon_test (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            type1 TEXT NOT NULL,
-            type2 TEXT
+          CREATE TABLE expanded_pokemon_test (
+            Number	INTEGER NOT NULL,
+            Name	TEXT NOT NULL,
+            Form	TEXT,
+            Type1	TEXT NOT NULL,
+            Type2	TEXT,
+            HP	INTEGER NOT NULL,
+            Attack	INTEGER NOT NULL,
+            Defense	INTEGER NOT NULL,
+            SPAttack	INTEGER NOT NULL,
+            SPDefense	INTEGER NOT NULL,
+            Speed	INTEGER NOT NULL,
+            PRIMARY KEY (Number,Form)
           )
+
         ''');
         //read the file like a text file and split it into a list of strings by line
-        final data = await rootBundle.loadString('assets/pokemon_test.sql');
+        final data = await rootBundle.loadString('assets/expanded_pokemon_test.sql');
         final lines = data.split('\n');
         Batch batch = db.batch();
-        for (var i=8; i<1033; i++){
+        for (var i=15; i<lines.length-1; i++){
           batch.rawInsert(lines[i]); //run the strings read from the file like an SQL format command
         }
         await batch.commit(noResult: true);
@@ -52,8 +61,8 @@ class MyApp extends StatelessWidget {
 
   Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
     final db = await initDB();
-    final result = await db.query('pokemon_test', where: 'id = ?', whereArgs: [index+1]);
-    return result[0]['name'] as String; //if multiple results are returned (ie. mutliple forms) the first is selected
+    final result = await db.query('expanded_pokemon_test', columns: ["Name"], where: 'Number = ?', whereArgs: [index+1]);
+    return result[0]['Name'] as String; //if multiple results are returned (ie. mutliple forms) the first is selected
   }
 
   @override
