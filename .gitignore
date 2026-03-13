@@ -1,0 +1,13 @@
+# Windows junk
+desktop.ini
+
+# macOS junk
+.DS_Store
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# temp files
+*.log
