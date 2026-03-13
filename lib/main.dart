@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dbaccess.dart';
+/*
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart' show rootBundle;
+*/
 
 void main(){
   runApp(const MyApp());
@@ -9,6 +12,7 @@ void main(){
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  /*
 
   Future<Database> initDB() async {
     final dbPath = await getDatabasesPath();
@@ -65,8 +69,11 @@ class MyApp extends StatelessWidget {
     return result[0]['Name'] as String; //if multiple results are returned (ie. mutliple forms) the first is selected
   }
 
+  */
+
   @override
   Widget build(BuildContext context) {
+    final DatabaseAccess db = DatabaseAccess();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(backgroundColor: Colors.purpleAccent, title: Text('Pokedex')),
@@ -74,7 +81,7 @@ class MyApp extends StatelessWidget {
           itemCount: 1025, //limit list view to maximum number of pokemon
           itemBuilder:(BuildContext context, int index) {
             return FutureBuilder<String>(
-              future: getNameAtIndex(index),
+              future: db.getNameAtIndex(index),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container(
@@ -83,10 +90,17 @@ class MyApp extends StatelessWidget {
                   );
                 }
 
-                if (!snapshot.hasData || snapshot.data == null) {
+                if (!snapshot.hasData) {
                   return Container(
                     height: 50,
                     child: Text("No data available"), //this text should never occur if the code works properly
+                  );
+                }
+
+                if (snapshot.data == null) {
+                  return Container(
+                    height: 50,
+                    child: Text("Null Data"), //this text should never occur if the code works properly
                   );
                 }
 
