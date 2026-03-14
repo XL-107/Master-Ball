@@ -73,6 +73,7 @@ class _MyAppState extends State<MyApp> {
     return result.isNotEmpty;
   }
 
+
   Future<List<Map<String, dynamic>>> getPokemon() async {
     final db = await initDB();
     return db.query('pokemon');
