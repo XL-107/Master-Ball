@@ -64,6 +64,7 @@ class DatabaseAccess{
     return db.query('pokemon_test');
   }
 
+  /*
   Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
     String output = 'Name Not Found';
     if (loaded.isEmpty){
@@ -121,5 +122,19 @@ class DatabaseAccess{
     }
 
     return output;
+  }
+  */
+
+  Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
+    final listIndex = loaded.indexWhere((element) => element['Number']==index+1);
+    if (listIndex==-1){
+      final db = await initDB();
+      final result = await db.query('expanded_pokemon_test', where: 'Number = ?', whereArgs: [index+1]);
+      loaded.add(result[0]);
+      return result[0]['Name'] as String; //if multiple results are returned (ie. mutliple forms) the first is selected
+    }
+    else{
+      return loaded[listIndex]['Name'] as String;
+    }
   }
 }
