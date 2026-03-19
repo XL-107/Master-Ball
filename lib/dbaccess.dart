@@ -1,9 +1,13 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data';
 
 class DatabaseAccess{
   //vars
+  late Database _db;
   final int loadedAtOnce = 50; //the minimum number of simultaneously loaded entries
   late List<Map<String, dynamic>> loaded;
 
@@ -14,127 +18,40 @@ class DatabaseAccess{
 
   //funcs
   Future<Database> initDB() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'newtable.db'); //name of file shouldn't really matter
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final dbPath = join(documentsDirectory.path, "MasterBall.db");
 
-    return openDatabase(
-      path,
-      version: 1,
-      
-      onConfigure:(db) async {
-        ///This deletes and re-creates the database each time
-        ///The final version won't do this, but it's useful for
-        ///now since we will be constantly updating how the db is built.
-        db.execute('DROP TABLE IF EXISTS expanded_pokemon_test');
-      },
-      onOpen: (db) async {
-        await db.execute('''
-          CREATE TABLE expanded_pokemon_test (
-            Number	INTEGER NOT NULL,
-            Name	TEXT NOT NULL,
-            Form	TEXT,
-            Type1	TEXT NOT NULL,
-            Type2	TEXT,
-            HP	INTEGER NOT NULL,
-            Attack	INTEGER NOT NULL,
-            Defense	INTEGER NOT NULL,
-            SPAttack	INTEGER NOT NULL,
-            SPDefense	INTEGER NOT NULL,
-            Speed	INTEGER NOT NULL,
-            PRIMARY KEY (Number,Form)
-          )
+    // Check if DB already exists
+    final exists = await File(dbPath).exists();
 
-        ''');
-        //read the file like a text file and split it into a list of strings by line
-        final data = await rootBundle.loadString('assets/expanded_pokemon_test.sql');
-        final lines = data.split('\n');
-        Batch batch = db.batch();
-        for (var i=15; i<lines.length-1; i++){
-          batch.rawInsert(lines[i]); //run the strings read from the file like an SQL format command
-        }
-        await batch.commit(noResult: true);
-      },
-    );
+    if (!exists) {
+      //Copy from assets onto machine's local files
+      ByteData data = await rootBundle.load("assets/MasterBall.db");
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      await File(dbPath).writeAsBytes(bytes, flush: true);
+    }
 
-
+    // Open the database (READ-ONLY optional)
+    return await openDatabase(dbPath, readOnly: true);
   }
 
   Future<List<Map<String, dynamic>>> getPokemon() async { //get all data for all pokemon
-    final db = await initDB();
-    return db.query('pokemon_test');
+    return _db.query('expanded_pokemon_test');
   }
 
-  /*
-  Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
-    String output = 'Name Not Found';
-    if (loaded.isEmpty){
-      final db = await initDB();
-      for (int i=index+1; i<=1025 && i<index+loadedAtOnce; i++){
-        final result = await db.query('expanded_pokemon_test', columns: ["Name"], where: 'Number = ?', whereArgs: [i]);
-        loaded.add(result[0]);
-      }
-      output = loaded[0]['Name'] as String;
-    }
-    
-    else if(index+1 < loaded[0]['Number']){ //requested pokemon is not loaded (id is too low)
-      final db = await initDB();
-      if ((loaded[0]['Number'] as int) - (index + 1) < 10){ //simply load everything between the requested and first loaded pokemon
-        for (int i=index+1; i<loaded[0]['Number']; i++){
-          final result = await db.query('expanded_pokemon_test', columns: ["Name"], where: 'Number = ?', whereArgs: [i]);
-          loaded.insert(0, result[0]);
-        }
-        output = loaded[0]['Name'] as String;
-      }
-
-      else{ //requested is so far away from what's loaded, we'll just clear out loaded and start from scratch
-        loaded = List<Map<String, dynamic>>.empty(growable: true);
-        return getNameAtIndex(index); //loaded is now empty, so the first if block will execute
-      }
-    }
-
-    else if(index+1 > loaded[loaded.length-1]['Number']){ //id is too high
-      final db = await initDB();
-      if ((index + 1) - (loaded[0]['Number'] as int) < 10){ //simply load everything between the requested and first loaded pokemon
-        for (int i=loaded[0]['Number']+1; i<=index+1; i++){
-          final result = await db.query('expanded_pokemon_test', columns: ["Name"], where: 'Number = ?', whereArgs: [i]);
-          loaded.add(result[0]);
-        }
-        output = loaded[0]['Name'] as String;
-      }
-
-      else{ //requested is so far away from what's loaded, we'll just clear out loaded and start from scratch
-        loaded = List<Map<String, dynamic>>.empty(growable: true);
-        return getNameAtIndex(index); //loaded is now empty, so the first if block will execute
-      }
-    }
-
-    else{ //requested pokemon is loaded
-      for (Map<String, dynamic> element in loaded){
-        if (element['Number']==index+1){
-          return element['Name'];
-        }
-      }
-      
-      //somehow, requested pokemon was not loaded
-      final db = await initDB();
-      final result = await db.query('expanded_pokemon_test', columns: ["Name"], where: 'Number = ?', whereArgs: [index+1]);
-      output = result[0]['Name'] as String;
-    }
-
-    return output;
-  }
-  */
 
   Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
     final listIndex = loaded.indexWhere((element) => element['Number']==index+1);
+    String output = "Not Found"; //Placeholder text doubles as error checking
     if (listIndex==-1){
       final db = await initDB();
       final result = await db.query('expanded_pokemon_test', where: 'Number = ?', whereArgs: [index+1]);
       loaded.add(result[0]);
-      return result[0]['Name'] as String; //if multiple results are returned (ie. mutliple forms) the first is selected
+      output = result[0]['Name'] as String; //if multiple results are returned (ie. mutliple forms) the first is selected
     }
     else{
-      return loaded[listIndex]['Name'] as String;
+      output = loaded[listIndex]['Name'] as String;
     }
+    return output;
   }
 }
