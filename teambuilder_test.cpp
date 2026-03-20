@@ -72,7 +72,7 @@ int main(int argc, char const *argv[]){
         std::cout << swampert_iter->first << " " << swampert_iter->second << std::endl;
         ++swampert_iter;
     }*/
-   
+    /*
     std::string type1 = get_pokemon(argv[1])[0];
     //std::cout << type1 << std::endl;
     std::string type2 = get_pokemon(argv[1])[1];
@@ -82,6 +82,33 @@ int main(int argc, char const *argv[]){
     while(iter != matchup.end()){
         std::cout << iter->first << " " << iter->second << std::endl;
         ++iter;
+    }*/
+    std::map<std::string, int> total_weaks;
+    std::map<std::string, int> total_resists;
+    for (unsigned int i = 1; i < argc; i++) {
+        std::string type1 = get_pokemon(argv[i])[0];
+        std::string type2 = get_pokemon(argv[i])[1];
+        TYPE_MATCHUPS matchup = defense_calc(get_type(type1), get_type(type2));
+        TYPE_MATCHUPS::iterator iter = matchup.begin();
+        while(iter != matchup.end()){
+            if (iter->second < 1.0){
+                total_resists[iter->first]++;
+            }else if (iter->second > 1.0){
+                total_weaks[iter->first]++;
+            }
+        }
+    }
+    std::map<std::string, int>::iterator weaks_iter = total_weaks.begin();
+    std::cout << "Total Weaknesses" << std::endl;
+    while (weaks_iter != total_weaks.end()){
+        std::cout << weaks_iter->first << ": " << weaks_iter->second << std::endl;
+        ++weaks_iter;
+    }
+    std::map<std::string, int>::iterator resists_iter = total_resists.begin();
+    std::cout << "Total Resistances" << std::endl;
+    while (resists_iter != total_resists.end()){
+        std::cout << resists_iter->first << ": " << resists_iter->second << std::endl;
+        ++resists_iter;
     }
     return 0;
 }
