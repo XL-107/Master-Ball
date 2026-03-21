@@ -2,7 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
+const typeNames = [
+  'Normal','Fire','Water','Electric','Grass','Ice',
+  'Fighting','Poison','Ground','Flying','Psychic',
+  'Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'
+];
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(TeambuilderMenu());
@@ -94,22 +98,18 @@ class TeambuilderMenu extends StatelessWidget{
               DataColumn(label: Text('Pokemon 5'),),
               DataColumn(label: Text('Pokemon 6'),),
             ],
-            rows:[
-              // Set the values to the columns 
-              DataRow(cells: [
-                DataCell(Text())
-              ]),
-              DataRow(cells: [
-                DataCell(Text("2")),
-                DataCell(Text("John")),
-                DataCell(Text("Anderson")),
-                DataCell(Text("24")),
-              ]),
-            ]
+            rows: typeNames.map((type) {
+              return DataRow(
+                cells: [
+                  DataCell(Text(type)),
+                  ...List.generate(6, (_) => DataCell(Text(''))),
+                ],
+              );
+            }).toList(),
           ),
         ),
       ),
-    )
+    );
   }
 }
 /*
