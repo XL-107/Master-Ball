@@ -27,6 +27,10 @@ class Pokemon{
     );
   }
 
+  String get getName{
+    return name;
+  }
+
   @override
   String toString() {
     return 'ID: $id, Name: $name, Type(s): $types';
