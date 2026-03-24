@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "expanded_pokemon_test" (
 	"Name"	TEXT NOT NULL,
 	"Form"	TEXT,
 	"Type1"	TEXT NOT NULL,
-	"Type2 "	TEXT,
+	"Type2"	TEXT,
 	"HP"	INTEGER NOT NULL,
 	"Attack"	INTEGER NOT NULL,
 	"Defense"	INTEGER NOT NULL,
