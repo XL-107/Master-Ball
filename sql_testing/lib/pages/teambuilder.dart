@@ -9,7 +9,7 @@ const typeNames = [
   'Fighting','Poison','Ground','Flying','Psychic',
   'Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'
 ];
-Future<Database> initDatabase() async {
+Future<Database> initDatabaseType() async {
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'type_chart.db');
 
@@ -30,9 +30,30 @@ Future<Database> initDatabase() async {
 
   return openDatabase(path);
 }
+Future<Database> initDatabasePokemon() async{
+  final dbPath = await getDatabasesPath();
+  final path = join(dbPath, 'pokemon_test.db');
+
+  // Check if DB already exists
+  final exists = await databaseExists(path);
+
+  if (exists) {
+    await deleteDatabase(path);
+  }
+
+  print("Copying database from assets...");
+
+  ByteData data = await rootBundle.load('assets/pokemon_test.db');
+  List<int> bytes =
+      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+  await File(path).writeAsBytes(bytes, flush: true);
+
+  return openDatabase(path);
+}
 //Function that returns all of the types from type_chart.db into the Type class
 Future<List<Type>> types() async {
-  final db = await initDatabase();
+  final db = await initDatabaseType();
   final List<Map<String, Object?>> typeMaps = await db.query("type_chart");
   return [for (final map in typeMaps) Type.fromMap(map),];
 }
@@ -40,7 +61,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(TeambuilderMenu());
 }
-//
 //class used to represent each type's defensive matchups in the form of a map. Key represents the offensive type going against
 //it and its value represents that type's matchup against the offensive type.
 class Type{
@@ -108,8 +128,8 @@ class Pokemon {
   });
   factory Pokemon.fromMap(Map<String, dynamic> map){
     return Pokemon(
-      id: map['id'],
-      name: map['name'],
+      id: map['ID'],
+      name: map['Name'],
       type1: map['Type1'],
       type2: map['Type2'] ?? 'None',
     );
@@ -135,17 +155,55 @@ double getDefMatchup(String primary, String secondary, String offense, List<Type
   }
   return multiplier;
 }
+//Helper function that gets a Pokemon's typing
+Future<Pokemon?> getPokemon(String pokemonName) async {
+  final db = await initDatabasePokemon();
+  final List<Map<String, dynamic>> result = await db.query(
+    'pokemon_test',
+    columns: ['ID', 'Name', 'Type1', 'Type2'],
+    where: 'Name = ?',
+    whereArgs: [pokemonName],
+    limit: 1,
+  );
+
+  if (result.isNotEmpty) {
+    return Pokemon.fromMap(result.first);
+  } else {
+    print("Pokemon not found");
+    return null;
+  }
+}
 class TeambuilderMenu extends StatefulWidget{
   @override
   State<TeambuilderMenu> createState() => TeambuilderMenuState();
 }
 class TeambuilderMenuState extends State<TeambuilderMenu> {
   List<Type> allTypes = [];
+  final List<String> pokemonNames = [
+    'Decidueye',
+    'Primarina',
+    'Vikavolt',
+    'Salazzle',
+    'Lycanroc',
+    'Kommo-o',
+  ];
+  Map<String, Pokemon> pokemonMap = {};
+  Future<void> loadPokemon() async {
+    for (var name in pokemonNames) {
+      final p = await getPokemon(name);
+      if (p != null) {
+        pokemonMap[name] = p;
+      }
+    }
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
     loadTypes();
+    loadPokemon();
+    print(pokemonMap);
   }
 
   void loadTypes() async {
@@ -173,24 +231,22 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
             // Datatable widget that have the property columns and rows.
             columns: [
               // Set the name of the column
-              DataColumn(label: Text('Type'),),
-              DataColumn(label: Text('Infernape'),),
-              DataColumn(label: Text('Milotic'),),
-              DataColumn(label: Text('Weavile'),),
-              DataColumn(label: Text('Magnezone'),),
-              DataColumn(label: Text('Gliscor'),),
-              DataColumn(label: Text('Flygon'),),
+              DataColumn(label: Text('Type')),
+              ...pokemonNames.map((name) => DataColumn(label: Text(name))),
             ],
             rows: typeNames.map((type) {
               return DataRow(
                 cells: [
                   DataCell(Text(type)),
-                  DataCell(Text(getDefMatchup('Fire', 'Fighting', type, allTypes).toString())),
-                  DataCell(Text(getDefMatchup('Water', 'Fairy', type, allTypes).toString())),
-                  DataCell(Text(getDefMatchup('Ice', 'Dark', type, allTypes).toString())),
-                  DataCell(Text(getDefMatchup('Electric', 'Steel', type, allTypes).toString())),
-                  DataCell(Text(getDefMatchup('Ground', 'Flying', type, allTypes).toString())),
-                  DataCell(Text(getDefMatchup('Bug', 'Dragon', type, allTypes).toString())),
+                  ...pokemonNames.map((name) {
+                    final pokemon = pokemonMap[name];
+                    if (pokemon == null) {
+                      return const DataCell(Text('...')); //for an incomplete team or no input yet
+                    }
+                    return DataCell(Text(
+                      getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString()
+                    ));
+                  }),
                 ],
               );
             }).toList(),
