@@ -72,7 +72,7 @@ int main(int argc, char const *argv[]){
         std::cout << swampert_iter->first << " " << swampert_iter->second << std::endl;
         ++swampert_iter;
     }*/
-    /*
+    
     std::string type1 = get_pokemon(argv[1])[0];
     //std::cout << type1 << std::endl;
     std::string type2 = get_pokemon(argv[1])[1];
@@ -82,8 +82,8 @@ int main(int argc, char const *argv[]){
     while(iter != matchup.end()){
         std::cout << iter->first << " " << iter->second << std::endl;
         ++iter;
-    }*/
-    std::map<std::string, int> total_weaks;
+    }
+    /*std::map<std::string, int> total_weaks;
     std::map<std::string, int> total_resists;
     for (unsigned int i = 1; i < argc; i++) {
         std::string type1 = get_pokemon(argv[i])[0];
@@ -109,7 +109,7 @@ int main(int argc, char const *argv[]){
     while (resists_iter != total_resists.end()){
         std::cout << resists_iter->first << ": " << resists_iter->second << std::endl;
         ++resists_iter;
-    }
+    }*/
     return 0;
 }
 
