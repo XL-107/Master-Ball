@@ -32,7 +32,7 @@ Future<Database> initDatabaseType() async {
 }
 Future<Database> initDatabasePokemon() async{
   final dbPath = await getDatabasesPath();
-  final path = join(dbPath, 'pokemon_test.db');
+  final path = join(dbPath, 'expanded_pokemon_test.db');
 
   // Check if DB already exists
   final exists = await databaseExists(path);
@@ -43,7 +43,7 @@ Future<Database> initDatabasePokemon() async{
 
   print("Copying database from assets...");
 
-  ByteData data = await rootBundle.load('assets/pokemon_test.db');
+  ByteData data = await rootBundle.load('assets/expanded_pokemon_test.db');
   List<int> bytes =
       data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
 
@@ -128,7 +128,7 @@ class Pokemon {
   });
   factory Pokemon.fromMap(Map<String, dynamic> map){
     return Pokemon(
-      id: map['ID'],
+      id: map['Number'],
       name: map['Name'],
       type1: map['Type1'],
       type2: map['Type2'] ?? 'None',
@@ -159,8 +159,8 @@ double getDefMatchup(String primary, String secondary, String offense, List<Type
 Future<Pokemon?> getPokemon(String pokemonName) async {
   final db = await initDatabasePokemon();
   final List<Map<String, dynamic>> result = await db.query(
-    'pokemon_test',
-    columns: ['ID', 'Name', 'Type1', 'Type2'],
+    'expanded_pokemon_test',
+    columns: ['Number', 'Name', 'Type1', 'Type2'],
     where: 'Name = ?',
     whereArgs: [pokemonName],
     limit: 1,
