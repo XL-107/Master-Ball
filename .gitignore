@@ -1,1 +1,16 @@
 sqlite3.o
+=======
+# Windows junk
+desktop.ini
+
+# macOS junk
+.DS_Store
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# temp files
+*.log
+>>>>>>> 4227d1a14aff72e57cd407ca8ed542521427e97e
