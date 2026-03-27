@@ -13,6 +13,7 @@ import 'pokemon.dart';
 class DatabaseAccess{
   //vars
   final int loadedAtOnce = 50; //the minimum number of simultaneously loaded entries
+  final int maxLoaded = 100; //the most that should be loaded in either direction of the current index
   late List<Pokemon> loaded;
 
   //init
@@ -61,6 +62,14 @@ class DatabaseAccess{
     else{
       output = loaded[listIndex].name;
     }
+
+    while (loaded[0].number < index-maxLoaded){
+      loaded.removeAt(0);
+    }
+    while (loaded[loaded.length-1].number > index+maxLoaded){
+      loaded.removeLast();
+    }
+
     return output;
   }
 
