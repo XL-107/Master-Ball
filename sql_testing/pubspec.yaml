@@ -57,6 +57,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/type_chart.db
+    - assets/pokemon_test.db
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -173,6 +173,7 @@ Future<Pokemon?> getPokemon(String pokemonName) async {
     return null;
   }
 }
+//TeambuilderMenu widget. Generates the content on the page.
 class TeambuilderMenu extends StatefulWidget{
   @override
   State<TeambuilderMenu> createState() => TeambuilderMenuState();
