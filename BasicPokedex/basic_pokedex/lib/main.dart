@@ -1,7 +1,7 @@
+import 'package:basic_pokedex/dexEntry.dart';
 import 'package:flutter/material.dart';
 import 'pokemon.dart';
 import 'pokeApiService.dart';
-import 'searchBar.dart';
 
 void main() {
   runApp(MainApp());
@@ -16,7 +16,6 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   final _service = PokeApiService();
-  final _searchController = SearchController();
   late Future<List<Pokemon>> _pokemonFuture;
   int currentIndex = 0;
 
@@ -42,42 +41,21 @@ class _MainAppState extends State<MainApp> {
             }
 
             final pokemonList = snapshot.data!; //unwraps future so pokemon list is accessible
-
+            
+            List<DexEntry> dexList = [];
+            for(int i = 0; i < pokemonList.length; ++i){ //turns each pokemon into a dexEntry widget so it can be used in gridView
+              dexList.add(DexEntry(pokemonEntry: pokemonList[i]));
+            }
+            
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SearchBarApp(
-                    controller: _searchController,
-                    pokemonList: pokemonList,
-                    onPokemonSelected: (index) => setState(() => currentIndex = index),
-                  ),
-                  Image.network(pokemonList[currentIndex].imageUrl),
-                  Text('${pokemonList[currentIndex]}'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => setState(() { //previous button
-                          currentIndex = (currentIndex - 1 + pokemonList.length) % pokemonList.length; //decrements index. mod so it can loop
-                        }),
-                        child: Text('Previous'),
-                      ),
-                      SizedBox(width: 16),
-                      ElevatedButton(
-                        onPressed: () => setState(() { //next button
-                          currentIndex = (currentIndex + 1) % pokemonList.length; //increments index. mod so it can loop
-                        }),
-                        child: Text('Next'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ); 
+              child: 
+                GridView.count(
+                  crossAxisCount: 5,
+                  children: dexList,
+                ),
+            );
           },
         ),
-        
       ),
     );
   }
