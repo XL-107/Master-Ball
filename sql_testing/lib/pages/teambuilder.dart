@@ -180,14 +180,8 @@ class TeambuilderMenu extends StatefulWidget{
 }
 class TeambuilderMenuState extends State<TeambuilderMenu> {
   List<Type> allTypes = [];
-  final List<String> pokemonNames = [
-    'Decidueye',
-    'Primarina',
-    'Vikavolt',
-    'Salazzle',
-    'Lycanroc',
-    'Kommo-o',
-  ];
+  final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
+  List<String> pokemonNames = [];
   Map<String, Pokemon> pokemonMap = {};
   Future<void> loadPokemon() async {
     for (var name in pokemonNames) {
@@ -197,6 +191,16 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
       }
     }
     setState(() {});
+  }
+  void updateTeam() async {
+    pokemonNames = controllers
+        .map((c) => c.text.trim())
+        .where((name) => name.isNotEmpty)
+        .toList();
+
+    pokemonMap.clear();
+
+    await loadPokemon();
   }
 
   @override
@@ -225,35 +229,61 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
         appBar: AppBar(
           title: Text('Pokemon Type Chart'),
         ),
-        body:
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            // Datatable widget that have the property columns and rows.
-            columns: [
-              // Set the name of the column
-              DataColumn(label: Text('Type')),
-              ...pokemonNames.map((name) => DataColumn(label: Text(name))),
-            ],
-            rows: typeNames.map((type) {
-              return DataRow(
-                cells: [
-                  DataCell(Text(type)),
-                  ...pokemonNames.map((name) {
-                    final pokemon = pokemonMap[name];
-                    if (pokemon == null) {
-                      return const DataCell(Text('...')); //for an incomplete team or no input yet
-                    }
-                    return DataCell(Text(
-                      getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString()
-                    ));
-                  }),
-                ],
-              );
-            }).toList(),
+        body: Column(
+          children: [
+            Wrap(
+              spacing: 10,
+              children: List.generate(6, (index) {
+                return SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: controllers[index],
+                    decoration: InputDecoration(
+                      labelText: 'Pokemon ${index + 1}',
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                updateTeam();
+              },
+              child: Text('Build Team'),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  // Datatable widget that have the property columns and rows.
+                  columns: [
+                    // Set the name of the column
+                    DataColumn(label: Text('Type')),
+                    ...pokemonNames.map((name) => DataColumn(label: Text(name))),
+                  ],
+                  rows: typeNames.map((type) {
+                    return DataRow(
+                      cells: [
+                        DataCell(Text(type)),
+                        ...pokemonNames.map((name) {
+                          final pokemon = pokemonMap[name];
+                          if (pokemon == null) {
+                            return const DataCell(Text('...')); //for an incomplete team or no input yet
+                          }
+                          return DataCell(Text(
+                            getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString()
+                          ));
+                        }),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
           ),
+          ],
         ),
-      ),
+      )
     );
   }
 }
