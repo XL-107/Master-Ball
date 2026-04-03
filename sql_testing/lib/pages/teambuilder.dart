@@ -253,7 +253,13 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
               child: Text('Build Team'),
             ),
             Expanded(
-              child: Row(
+              child: pokemonNames.isEmpty ? const Center(
+                child: Text(
+                  "Enter a team",
+                  style: TextStyle(fontSize: 18),
+                ),
+                )
+                : Row(
                 children:
                 [
                   DataTable(
@@ -272,20 +278,18 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
-                        columns: [...pokemonNames.map((name) => DataColumn(label: Text(name))),],
+                        columns: pokemonNames.map((name) => DataColumn(label: Text(name))).toList(),
                         rows: typeNames.map((type) {
                           return DataRow(
-                            cells: [
-                              ...pokemonNames.map((name) {
-                                final pokemon = pokemonMap[name];
-                                if (pokemon == null) {
-                                  return const DataCell(Text('...')); //for an incomplete team or no input yet
-                                }
-                                return DataCell(Text(
-                                  getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString()
-                                ));
-                              }),
-                            ],
+                            cells: pokemonNames.map((name) {
+                              final pokemon = pokemonMap[name];
+
+                              if (pokemon == null) {
+                                return const DataCell(Text('N/A'));
+                              }
+
+                              return DataCell(Text(getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString(),));
+                            }).toList(),
                           );
                         }).toList(),
                       ),
