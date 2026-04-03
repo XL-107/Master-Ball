@@ -3,22 +3,68 @@ import sqlite3
 import pandas as pd
 
 def get_all_pokemon():
-    query = "SELECT DISTINCT Name, Form FROM expanded_pokemon_test WHERE Form IS NOT NULL"
+    # errorFile = open("aaa.txt", "w", encoding="utf-8")
+    outputFile = open("pokemon_abilities.csv", "w", encoding="utf-8")
+    outputFile.write("Number,Name,Form,Ability1,Ability2,Hidden\n")
+    query = "SELECT Number, Name FROM expanded_pokemon_test WHERE Form IS NULL"
 
     conn = sqlite3.connect('MasterBall.db')
     db = pd.read_sql(query, conn)
     
     for x in db.itertuples():
-        print(x)
+        result = f"{x[1]:03d},{x[2]}," # The , is the blank form
+        # print(result)
+        pokemon = "-".join(x[2].split())
+        print(pokemon, end = ", ")
+        abilities = abilityAPI(pokemon, "")
+
+        match len(abilities):
+            case 1:
+                # One ability goes into slot 1, with the rest blank.
+                temp = " ".join(abilities[0]["ability"]["name"].split("-")).title()
+                result += "," + temp + ",,\n"
+            case 3:
+                # Three abilities go in each slot. 
+                for y in abilities:
+                    temp = " ".join(y["ability"]["name"].split("-")).title()
+                    result += "," +  temp
+                result += "\n"
+            case 2:
+                # Initial ability goes into slot 1, and then hidden ability.
+                one = " ".join(abilities[0]["ability"]["name"].split("-")).title()
+                hidden = " ".join(abilities[1]["ability"]["name"].split("-")).title()
+                result += f",{one},,{hidden}\n"
+            case 0:
+                # errorFile.write("invalid: " + pokemon + "\n")
+                result += ",???,,\n"
+        outputFile.write(result)
+
+
+
+
+        # for y in abilities:
+        #     total = 0
+        
+            # match y["slot"]:
+            #     case 1:
+            #         # print("Slot 1:", temp)
+            #         result += temp + ","
+            #         total += 1
+            #     case 2:
+            #         if (total )
+            #         print("Slot 2:", temp)
+            #     case 3:
+            #         print("Slot 3:", temp)
+
+
     
     
     return
 
-def abilityAPI():
+def abilityAPI(pokemon, form):
     # FORM HANDLING: 
     # Megas: <name>-mega
     #      X/Y: <name>-mega-x  
-    # Gmax: <name>-gmax
     # Alolan: <name>-alola
     # Galarian: <name>-galar
     # Hisuian: <name>-hisui
@@ -56,7 +102,7 @@ def abilityAPI():
     #         <>-<red/orange/yellow/green/blue/indigo/violet>-meteor
     #         note: all of these have the same ability...
     # Necrozma: <>-dusk, <>-dawn, <>-ultra
-    # Toxtricity: <>-low-key, <>-amped     (<>-gmax)
+    # Toxtricity: <>-low-key, <>-amped 
     # Eiscue: <>-ice, <>-noice
     # Indeedee: <>-female, <>-male
     # Morpeko: <>-full-belly, <>-hangry
@@ -77,13 +123,9 @@ def abilityAPI():
     # Ogerpon: <>, <>-<cornerstone/hearthflame/wellspring>-mask (teal is default)
     # Terapagos: <>, <>-stellar, <>-terastal
 
-
-
-
-
-    url = "https://pokeapi.co/api/v2/pokemon/Vanillite"
+    url = "https://pokeapi.co/api/v2/pokemon/" + pokemon
     response = requests.get(url)
-    print(response)
+    # print(response)
     if response.status_code == 200:
         data = response.json()
         return data["abilities"]
