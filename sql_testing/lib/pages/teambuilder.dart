@@ -253,32 +253,46 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
               child: Text('Build Team'),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  // Datatable widget that have the property columns and rows.
-                  columns: [
-                    // Set the name of the column
-                    DataColumn(label: Text('Type')),
-                    ...pokemonNames.map((name) => DataColumn(label: Text(name))),
-                  ],
-                  rows: typeNames.map((type) {
-                    return DataRow(
-                      cells: [
-                        DataCell(Text(type)),
-                        ...pokemonNames.map((name) {
-                          final pokemon = pokemonMap[name];
-                          if (pokemon == null) {
-                            return const DataCell(Text('...')); //for an incomplete team or no input yet
-                          }
-                          return DataCell(Text(
-                            getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString()
-                          ));
-                        }),
-                      ],
-                    );
-                  }).toList(),
-                ),
+              child: Row(
+                children:
+                [
+                  DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Type')),
+                    ],
+                    rows: typeNames.map((type) {
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(type)),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: [...pokemonNames.map((name) => DataColumn(label: Text(name))),],
+                        rows: typeNames.map((type) {
+                          return DataRow(
+                            cells: [
+                              ...pokemonNames.map((name) {
+                                final pokemon = pokemonMap[name];
+                                if (pokemon == null) {
+                                  return const DataCell(Text('...')); //for an incomplete team or no input yet
+                                }
+                                return DataCell(Text(
+                                  getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString()
+                                ));
+                              }),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    
+                  ),
+                ],
               ),
           ),
           ],
