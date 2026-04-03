@@ -52,6 +52,7 @@ class DatabaseAccess{
   Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
     if (sortMethod!="Number"){
       loaded = List<Pokemon>.empty(growable: true);
+      sortMethod = "Number";
     }
     final listIndex = loaded.indexWhere((element) => element.number==index+1);
     String output = "Not Found"; //Placeholder text doubles as error checking
@@ -83,6 +84,7 @@ class DatabaseAccess{
   Future<Pokemon> getPokemonAtIndex(int index) async { //returns a full Pokemon object, as specified in pokemon.dart
     if (sortMethod!="Number"){
       loaded = List<Pokemon>.empty(growable: true);
+      sortMethod = "Number";
     }
     final listIndex = loaded.indexWhere((element) => element.number==index+1);
     if (listIndex==-1){
