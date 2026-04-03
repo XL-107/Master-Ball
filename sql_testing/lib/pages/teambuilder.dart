@@ -259,46 +259,48 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                   style: TextStyle(fontSize: 18),
                 ),
                 )
-                : Row(
-                children:
-                [
-                  DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Type')),
-                    ],
-                    rows: typeNames.map((type) {
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(type)),
+                : SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DataTable(
+                        columns: const [
+                          DataColumn(label: Text('Type')),
                         ],
-                      );
-                    }).toList(),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columns: pokemonNames.map((name) => DataColumn(label: Text(name))).toList(),
                         rows: typeNames.map((type) {
                           return DataRow(
-                            cells: pokemonNames.map((name) {
-                              final pokemon = pokemonMap[name];
-
-                              if (pokemon == null) {
-                                return const DataCell(Text('N/A'));
-                              }
-
-                              return DataCell(Text(getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString(),));
-                            }).toList(),
+                            cells: [
+                              DataCell(Text(type)),
+                            ],
                           );
                         }).toList(),
                       ),
-                    ),
-                    
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columns: pokemonNames.map((name) => DataColumn(label: Text(name))).toList(),
+                            rows: typeNames.map((type) {
+                              return DataRow(
+                                cells: pokemonNames.map((name) {
+                                  final pokemon = pokemonMap[name];
+
+                                  if (pokemon == null) {
+                                    return const DataCell(Text('N/A'));
+                                  }
+
+                                  return DataCell(Text(getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString(),));
+                                }).toList(),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-          ),
+                ),
+            ),
           ],
         ),
       )
