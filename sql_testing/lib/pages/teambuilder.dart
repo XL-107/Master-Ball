@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-const typeNames = [
+var typeNames = [
   'Normal','Fire','Water','Electric','Grass','Ice',
   'Fighting','Poison','Ground','Flying','Psychic',
   'Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'
@@ -183,6 +183,46 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
   List<String> pokemonNames = [];
   Map<String, Pokemon> pokemonMap = {};
+  Map<String, int> totalWeaks = {
+    'Normal': 0,
+    'Fire': 0,
+    'Water': 0,
+    'Electric': 0,
+    'Grass': 0,
+    'Ice': 0,
+    'Fighting': 0,
+    'Poison': 0,
+    'Ground': 0,
+    'Flying': 0,
+    'Psychic': 0,
+    'Bug': 0,
+    'Rock': 0,
+    'Ghost': 0,
+    'Dragon': 0,
+    'Dark': 0,
+    'Steel': 0,
+    'Fairy': 0,
+  };
+  Map<String, int> totalResists = {
+    'Normal': 0,
+    'Fire': 0,
+    'Water': 0,
+    'Electric': 0,
+    'Grass': 0,
+    'Ice': 0,
+    'Fighting': 0,
+    'Poison': 0,
+    'Ground': 0,
+    'Flying': 0,
+    'Psychic': 0,
+    'Bug': 0,
+    'Rock': 0,
+    'Ghost': 0,
+    'Dragon': 0,
+    'Dark': 0,
+    'Steel': 0,
+    'Fairy': 0,
+  };
   Future<void> loadPokemon() async {
     for (var name in pokemonNames) {
       final p = await getPokemon(name);
@@ -280,18 +320,31 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
-                            columns: pokemonNames.map((name) => DataColumn(label: Text(name))).toList(),
+                            columns: [
+                              ...pokemonNames.map((name) => DataColumn(label: Text(name))),
+                              DataColumn(label: Text('Total Weaks')),
+                              DataColumn(label: Text('Total Resists')),
+                            ],
+
                             rows: typeNames.map((type) {
                               return DataRow(
-                                cells: pokemonNames.map((name) {
-                                  final pokemon = pokemonMap[name];
-
-                                  if (pokemon == null) {
-                                    return const DataCell(Text('N/A'));
-                                  }
-
-                                  return DataCell(Text(getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes).toString(),));
-                                }).toList(),
+                                cells: [
+                                  ...pokemonNames.map((name) {
+                                    final pokemon = pokemonMap[name];
+                                    if (pokemon == null) {
+                                      return const DataCell(Text('N/A'));
+                                    }
+                                    final matchup = getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes);
+                                    if (matchup < 1.0) {
+                                      totalResists[type] = (totalResists[type] ?? 0) + 1;
+                                    }else if (matchup > 1.0){
+                                      totalWeaks[type] = (totalWeaks[type] ?? 0) + 1;
+                                    }
+                                    return DataCell(Text(matchup.toString()));
+                                  }),
+                                  DataCell(Text(totalWeaks[type].toString())),
+                                  DataCell(Text(totalResists[type].toString())),
+                                ],
                               );
                             }).toList(),
                           ),
