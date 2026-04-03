@@ -12,7 +12,6 @@ import 'pokemon.dart';
 
 class DatabaseAccess{
   //vars
-  final int loadedAtOnce = 50; //the minimum number of simultaneously loaded entries
   final int maxLoaded = 100; //the most that should be loaded in either direction of the current index
   late List<Pokemon> loaded;
 
@@ -36,8 +35,12 @@ class DatabaseAccess{
       await File(dbPath).writeAsBytes(bytes, flush: true);
     }
 
-    // Open the database (READ-ONLY optional)
-    return await openDatabase(dbPath, readOnly: true);
+    //open the database (we're only reading it, but readonly has to be false for creating table view)
+    final db = await openDatabase(dbPath, readOnly: false);
+    db.execute('DROP VIEW IF EXISTS pokemon_with_total');
+    db.execute('CREATE VIEW pokemon_with_total AS SELECT *, (HP + Attack + Defense + "SP.Attack" + "SP.Defense" + Speed) AS Total FROM expanded_pokemon_test');
+    
+    return db;
   }
 
   Future<List<Map<String, dynamic>>> getPokemon() async { //get all data for all pokemon
@@ -80,7 +83,7 @@ class DatabaseAccess{
       final result = await db.query('expanded_pokemon_test', where: 'Number = ?', whereArgs: [index+1]);
       
       //Turn result into Pokemon object, in case we want to perform operations on it down the line, like add it to saved teams
-      Pokemon pkmnResult = Pokemon(index+1, result[0]['Name'] as String, [], [], [result[0]['Type1'] as String, result[0]['Type2'] as String],
+      Pokemon pkmnResult = Pokemon(index+1, result[0]['Name'] as String, [], [], [result[0]['Type1'] as String, result[0]['Type2']==null ? "None" : result[0]['Type2'] as String],
                                   [result[0]['HP'] as int, result[0]['Attack'] as int, result[0]['Defense'] as int, 
                                   result[0]['SP.Attack'] as int, result[0]['SP.Defense'] as int, result[0]['Speed'] as int]);
       loaded.add(pkmnResult);
@@ -89,5 +92,15 @@ class DatabaseAccess{
     else{
       return loaded[listIndex];
     }
+  }
+
+  Future<Pokemon> getPokemonByStat(int index, String stat) async{ //return results sorted by the desired stat, use Total to sort by BST
+    final db = await initDB();
+
+    final result = await db.rawQuery('SELECT * FROM pokemon_with_total ORDER BY "$stat" DESC LIMIT ${index+1}');
+    Pokemon pkmnResult = Pokemon(index+1, (result[index]['Form'] ?? result[index]['Name']) as String, [], [], [result[index]['Type1'] as String, result[index]['Type2']==null ? "None" : result[index]['Type2'] as String],
+                                  [result[index]['HP'] as int, result[index]['Attack'] as int, result[index]['Defense'] as int, 
+                                  result[index]['SP.Attack'] as int, result[index]['SP.Defense'] as int, result[index]['Speed'] as int]);
+    return pkmnResult;
   }
 }
