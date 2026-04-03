@@ -14,6 +14,7 @@ class DatabaseAccess{
   //vars
   final int maxLoaded = 100; //the most that should be loaded in either direction of the current index
   late List<Pokemon> loaded;
+  String sortMethod = "Number"; //keeps track of what the loaded variable is currently sorted by; it is pokemon ID by default
 
   //init
   DatabaseAccess(){
@@ -49,6 +50,9 @@ class DatabaseAccess{
   }
 
   Future<String> getNameAtIndex(int index) async { //get only the name of a pokemon of a specified id
+    if (sortMethod!="Number"){
+      loaded = List<Pokemon>.empty(growable: true);
+    }
     final listIndex = loaded.indexWhere((element) => element.number==index+1);
     String output = "Not Found"; //Placeholder text doubles as error checking
     if (listIndex==-1){
@@ -77,6 +81,9 @@ class DatabaseAccess{
   }
 
   Future<Pokemon> getPokemonAtIndex(int index) async { //returns a full Pokemon object, as specified in pokemon.dart
+    if (sortMethod!="Number"){
+      loaded = List<Pokemon>.empty(growable: true);
+    }
     final listIndex = loaded.indexWhere((element) => element.number==index+1);
     if (listIndex==-1){
       final db = await initDB();
@@ -96,11 +103,24 @@ class DatabaseAccess{
 
   Future<Pokemon> getPokemonByStat(int index, String stat) async{ //return results sorted by the desired stat, use Total to sort by BST
     final db = await initDB();
+    if (sortMethod!=stat){
+      sortMethod=stat;
+      loaded = List<Pokemon>.empty(growable: true);
+    }
+
+    if (loaded.length>index){
+      return loaded[index]; //if loaded is sorted by stats, it will have everything from the first pokemon until the current, unlike when sorting by number
+    }
 
     final result = await db.rawQuery('SELECT * FROM pokemon_with_total ORDER BY "$stat" DESC LIMIT ${index+1}');
-    Pokemon pkmnResult = Pokemon(index+1, (result[index]['Form'] ?? result[index]['Name']) as String, [], [], [result[index]['Type1'] as String, result[index]['Type2']==null ? "None" : result[index]['Type2'] as String],
-                                  [result[index]['HP'] as int, result[index]['Attack'] as int, result[index]['Defense'] as int, 
-                                  result[index]['SP.Attack'] as int, result[index]['SP.Defense'] as int, result[index]['Speed'] as int]);
-    return pkmnResult;
+    for (int i=loaded.length; i<=index; i++){
+      Pokemon pkmnResult = Pokemon(result[i]["Number"] as int, (result[i]['Form'] ?? result[i]['Name']) as String, [], [], [result[i]['Type1'] as String, result[i]['Type2']==null ? "None" : result[i]['Type2'] as String],
+                                  [result[i]['HP'] as int, result[i]['Attack'] as int, result[i]['Defense'] as int, 
+                                  result[i]['SP.Attack'] as int, result[i]['SP.Defense'] as int, result[i]['Speed'] as int]);
+    loaded.add(pkmnResult);
+    }
+
+    print(loaded.length);
+    return loaded[loaded.length-1];
   }
 }
