@@ -223,6 +223,12 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     'Steel': 0,
     'Fairy': 0,
   };
+  String getTypeAsset(String type) {
+    return 'assets/type_logos/$type.png';
+  }
+  String getPokemonImage(String pokemon) {
+    return 'play.pokemonshowdown.com/sprites/gen5/${pokemon.toLowerCase()}.png';
+  }
   Future<void> loadPokemon() async {
     for (var name in pokemonNames) {
       final p = await getPokemon(name);
@@ -311,7 +317,11 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                         rows: typeNames.map((type) {
                           return DataRow(
                             cells: [
-                              DataCell(Text(type)),
+                              DataCell(Image.asset(
+                                getTypeAsset(type),
+                                width: 32,
+                                height: 32,
+                              )),
                             ],
                           );
                         }).toList(),
