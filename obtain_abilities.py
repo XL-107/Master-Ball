@@ -3,21 +3,29 @@ import sqlite3
 import pandas as pd
 
 def get_all_pokemon():
-    # errorFile = open("aaa.txt", "w", encoding="utf-8")
+    errorFile = open("aaa.txt", "w", encoding="utf-8")
     outputFile = open("pokemon_abilities.csv", "w", encoding="utf-8")
+    # outputFile = open("new_pokemon_abilities.csv", "w", encoding="utf-8")
+
     outputFile.write("Number,Name,Form,Ability1,Ability2,Hidden\n")
-    query = "SELECT Number, Name FROM expanded_pokemon_test WHERE Form IS NULL"
+    query = "SELECT Number, Name, Form FROM expanded_pokemon_test"
 
     conn = sqlite3.connect('MasterBall.db')
     db = pd.read_sql(query, conn)
     
     for x in db.itertuples():
-        result = f"{x[1]:03d},{x[2]}," # The , is the blank form
-        # print(result)
-        pokemon = "-".join(x[2].split())
-        print(pokemon, end = ", ")
-        abilities = abilityAPI(pokemon, "")
+        result = f"{x[1]:03d},{x[2]}"
+        form = ""
+        if (not pd.isnull(x[3])): # Has a form
+            form = x[3].split()[0]
+            result += f",{x[3]}"
+        else:
+            result += f","
 
+        pokemon = "-".join(x[2].split())
+        print(pokemon, end = ", ", flush=True)
+
+        abilities = abilityAPI(pokemon, form)
         match len(abilities):
             case 1:
                 # One ability goes into slot 1, with the rest blank.
@@ -34,8 +42,8 @@ def get_all_pokemon():
                 one = " ".join(abilities[0]["ability"]["name"].split("-")).title()
                 hidden = " ".join(abilities[1]["ability"]["name"].split("-")).title()
                 result += f",{one},,{hidden}\n"
-            case 0:
-                # errorFile.write("invalid: " + pokemon + "\n")
+            case _:
+                errorFile.write("invalid: " + pokemon + "\n")
                 result += ",???,,\n"
         outputFile.write(result)
 
@@ -70,7 +78,25 @@ def abilityAPI(pokemon, form):
     # Hisuian: <name>-hisui
     # Paldean: wooper-paldea
     # Primal: kyogre-primal groudon-primal
-    # 
+    
+    # form_url = ""
+    match form:
+        case "Mega":
+            form_url = "-mega"
+        case "Alolan":
+            form_url = "-alola"
+        case "Galarian":
+            form_url = "-galar"
+        case "Hisuian":
+            form_url = "-hisui"
+        case "Primal":
+            form_url = "-primal"
+        case "":
+            form_url = ""
+        case _:
+            form_url = "-" + form
+
+
     # OTHER CASES: 
     # Deoxys: deoxys-<normal/attack/defense/speed> 
     # Partner Pikachu/Eevee: pikachu-starter eevee-starter
@@ -123,7 +149,9 @@ def abilityAPI(pokemon, form):
     # Ogerpon: <>, <>-<cornerstone/hearthflame/wellspring>-mask (teal is default)
     # Terapagos: <>, <>-stellar, <>-terastal
 
-    url = "https://pokeapi.co/api/v2/pokemon/" + pokemon
+    url = "https://pokeapi.co/api/v2/pokemon/" + pokemon + form_url
+    # print(pokemon + form_url)
+
     response = requests.get(url)
     # print(response)
     if response.status_code == 200:
