@@ -2,31 +2,35 @@ import requests
 import sqlite3
 import pandas as pd
 
+# https://pokeapi.co/api/v2/
+
+
 def get_all_pokemon():
-    errorFile = open("aaa.txt", "w", encoding="utf-8")
     outputFile = open("pokemon_abilities.csv", "w", encoding="utf-8")
-    # outputFile = open("new_pokemon_abilities.csv", "w", encoding="utf-8")
-
     outputFile.write("Number,Name,Form,Ability1,Ability2,Hidden\n")
-    query = "SELECT Number, Name, Form FROM expanded_pokemon_test"
 
+    query = "SELECT Number, Name, Form FROM expanded_pokemon_test"
     conn = sqlite3.connect('MasterBall.db')
     db = pd.read_sql(query, conn)
     
     for x in db.itertuples():
-        result = f"{x[1]:03d},{x[2]}"
+        result = f"{x[1]:03d},{x[2]},"
         form = ""
         if (not pd.isnull(x[3])): # Has a form
             form = x[3].split()[0]
-            result += f",{x[3]}"
-        else:
-            result += f","
+            result += f"{x[3]}"
 
-        pokemon = "-".join(x[2].split())
+        pokemon = "-".join(x[2].split()) # Formatting for API URL
         print(pokemon, end = ", ", flush=True)
 
         abilities = abilityAPI(pokemon, form)
         match len(abilities):
+            # There are three non-error cases: 
+            # - Only one ability.
+            # - One ability and one hidden ability. 
+            #       There is no instance of a pokemon with two normal abilities
+            #       and no hidden ability, but it's been coded just in case. 
+            # - Two abilities and one hidden. 
             case 1:
                 # One ability goes into slot 1, with the rest blank.
                 temp = " ".join(abilities[0]["ability"]["name"].split("-")).title()
@@ -38,70 +42,53 @@ def get_all_pokemon():
                     result += "," +  temp
                 result += "\n"
             case 2:
-                # Initial ability goes into slot 1, and then hidden ability.
+                # Initial ability goes into slot 1, and then the second ability is checked.
                 one = " ".join(abilities[0]["ability"]["name"].split("-")).title()
-                hidden = " ".join(abilities[1]["ability"]["name"].split("-")).title()
-                result += f",{one},,{hidden}\n"
-            case _:
-                errorFile.write("invalid: " + x[2])
-                if (not pd.isnull(x[3])):
-                    errorFile.write(", " + x[3] + "\n")
+                two = " ".join(abilities[1]["ability"]["name"].split("-")).title()
+                if (abilities[1]["is_hidden"]): # This is a boolean.
+                    result += f",{one},,{two}\n"
                 else:
-                    errorFile.write("\n")
+                    result += f",{one},{two},\n"
+            case _:
+                # If a weird value returns (should be 0), list the ability as ???
+                # This also applies if the pokemon HAS no ability, 
+                # such as the new Megas added in Legends:ZA.
                 result += ",???,,\n"
         outputFile.write(result)
-
-
-
-
-        # for y in abilities:
-        #     total = 0
-        
-            # match y["slot"]:
-            #     case 1:
-            #         # print("Slot 1:", temp)
-            #         result += temp + ","
-            #         total += 1
-            #     case 2:
-            #         if (total )
-            #         print("Slot 2:", temp)
-            #     case 3:
-            #         print("Slot 3:", temp)
-
-
-    
-    
     return
 
+# Given the pokemon and the first word of the form, returns an ability list from PokeAPI.
+# Due to inconsistencies with the way the site handles Forms and text formatting issues, 
+# a small handful of pokemon will return an empty list. 
 def abilityAPI(pokemon, form):
-    # FORM HANDLING: 
-    # Megas: <name>-mega
-    #      X/Y: <name>-mega-x  
-    # Alolan: <name>-alola
-    # Galarian: <name>-galar
-    # Hisuian: <name>-hisui
-    # Paldean: wooper-paldea
-    # Primal: kyogre-primal groudon-primal
-    
-    # form_url = ""
+    # Figure out the additional form format to add to the end of the URL.
     match form:
-        case "Mega":
-            form_url = "-mega"
+        case "": # If blank, keep blank.
+            form_url = ""
         case "Alolan":
             form_url = "-alola"
         case "Galarian":
             form_url = "-galar"
         case "Hisuian":
             form_url = "-hisui"
-        case "Primal":
-            form_url = "-primal"
-        case "":
-            form_url = ""
+        case "Paldean": # This handles... only wooper, because tauros is a special case. 
+            form_url = "-paldea"
+        # Future regions can be added as needed. 
         case _:
+            # Given some other form, just use the form itself in the URL. 
+            # This handles (most) Megas, but also works for a majority of the weird cases. 
+            # EX: Deoxys-Normal, Meloetta-Aria, Indeedee-Male...
             form_url = "-" + form
 
-
-    # OTHER CASES: 
+    # OFFICIAL FORM HANDLING: 
+    # Megas: <name>-mega
+    #      X/Y: <name>-mega-x  
+    # Alolan: <name>-alola
+    # Galarian: <name>-galar
+    # Hisuian: <name>-hisui
+    # Paldean: wooper-paldea
+    #
+    # Primal: kyogre-primal groudon-primal
     # Deoxys: deoxys-<normal/attack/defense/speed> 
     # Partner Pikachu/Eevee: pikachu-starter eevee-starter
     # Castform: castform, castform-<rainy/sunny/snowy> 
@@ -163,17 +150,7 @@ def abilityAPI(pokemon, form):
         return data["abilities"]
     return []
 
-def getInvalid():
-    errorFile = open("aaa.txt", "w", encoding="utf-8")
-    inputFile = open("pokemon_abilities.csv", "r", encoding="utf-8")
-    for line in inputFile:
-        if "???" in line:
-            errorFile.write(line)
-
-
-
-
 def main():
-    getInvalid()
+    get_all_pokemon()
 
 main()
