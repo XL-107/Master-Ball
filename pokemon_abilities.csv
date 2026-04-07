@@ -6,8 +6,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 004,Charmander,,Blaze,,Solar Power
 005,Charmeleon,,Blaze,,Solar Power
 006,Charizard,,Blaze,,Solar Power
-006,Charizard,Mega Charizard X,???,,
-006,Charizard,Mega Charizard Y,???,,
+006,Charizard,Mega Charizard X,Tough Claws,,
+006,Charizard,Mega Charizard Y,Drought,,
 007,Squirtle,,Torrent,,Rain Dish
 008,Wartortle,,Torrent,,Rain Dish
 009,Blastoise,,Torrent,,Rain Dish
@@ -32,17 +32,17 @@ Number,Name,Form,Ability1,Ability2,Hidden
 023,Ekans,,Intimidate,Shed Skin,Unnerve
 024,Arbok,,Intimidate,Shed Skin,Unnerve
 025,Pikachu,,Static,,Lightning Rod
-025,Pikachu,Partner Pikachu,???,,
+025,Pikachu,Partner Pikachu,Static,,Lightning Rod
 026,Raichu,,Static,,Lightning Rod
 026,Raichu,Alolan Raichu,Surge Surfer,,
 027,Sandshrew,,Sand Veil,,Sand Rush
 027,Sandshrew,Alolan Sandshrew,Snow Cloak,,Slush Rush
 028,Sandslash,,Sand Veil,,Sand Rush
 028,Sandslash,Alolan Sandslash,Snow Cloak,,Slush Rush
-029,Nidoran♀,,???,,
+029,Nidoran♀,,Poison Point,Rivalry,Hustle
 030,Nidorina,,Poison Point,Rivalry,Hustle
 031,Nidoqueen,,Poison Point,Rivalry,Sheer Force
-032,Nidoran♂,,???,,
+032,Nidoran♂,,Poison Point,Rivalry,Hustle
 033,Nidorino,,Poison Point,Rivalry,Hustle
 034,Nidoking,,Poison Point,Rivalry,Sheer Force
 035,Clefairy,,Cute Charm,Magic Guard,Friend Guard
@@ -112,8 +112,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 080,Slowbro,Mega Slowbro,Shell Armor,,
 081,Magnemite,,Magnet Pull,Sturdy,Analytic
 082,Magneton,,Magnet Pull,Sturdy,Analytic
-083,Farfetch'd,,???,,
-083,Farfetch'd,Galarian Farfetch'd,???,,
+083,Farfetch'd,,Keen Eye,Inner Focus,Defiant
+083,Farfetch'd,Galarian Farfetch'd,Steadfast,,Scrappy
 084,Doduo,,Run Away,Early Bird,Tangled Feet
 085,Dodrio,,Run Away,Early Bird,Tangled Feet
 086,Seel,,Thick Fat,Hydration,Ice Body
@@ -161,8 +161,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 119,Seaking,,Swift Swim,Water Veil,Lightning Rod
 120,Staryu,,Illuminate,Natural Cure,Analytic
 121,Starmie,,Illuminate,Natural Cure,Analytic
-122,Mr. Mime,,???,,
-122,Mr. Mime,Galarian Mr. Mime,???,,
+122,Mr. Mime,,Soundproof,Filter,Technician
+122,Mr. Mime,Galarian Mr. Mime,Vital Spirit,Screen Cleaner,Ice Body
 123,Scyther,,Swarm,Technician,Steadfast
 124,Jynx,,Oblivious,Forewarn,Dry Skin
 125,Electabuzz,,Static,,Vital Spirit
@@ -170,16 +170,16 @@ Number,Name,Form,Ability1,Ability2,Hidden
 127,Pinsir,,Hyper Cutter,Mold Breaker,Moxie
 127,Pinsir,Mega Pinsir,Aerilate,,
 128,Tauros,,Intimidate,Anger Point,Sheer Force
-128,Tauros,Aqua Breed,???,,
-128,Tauros,Blaze Breed,???,,
-128,Tauros,Combat Breed,???,,
+128,Tauros,Aqua Breed,Intimidate,Anger Point,Cud Chew
+128,Tauros,Blaze Breed,Intimidate,Anger Point,Cud Chew
+128,Tauros,Combat Breed,Intimidate,Anger Point,Cud Chew
 129,Magikarp,,Swift Swim,,Rattled
 130,Gyarados,,Intimidate,,Moxie
 130,Gyarados,Mega Gyarados,Mold Breaker,,
 131,Lapras,,Water Absorb,Shell Armor,Hydration
 132,Ditto,,Limber,,Imposter
 133,Eevee,,Run Away,Adaptability,Anticipation
-133,Eevee,Partner Eevee,???,,
+133,Eevee,Partner Eevee,Run Away,Adaptability,Anticipation
 134,Vaporeon,,Water Absorb,,Hydration
 135,Jolteon,,Volt Absorb,,Quick Feet
 136,Flareon,,Flash Fire,,Guts
@@ -200,10 +200,10 @@ Number,Name,Form,Ability1,Ability2,Hidden
 147,Dratini,,Shed Skin,,Marvel Scale
 148,Dragonair,,Shed Skin,,Marvel Scale
 149,Dragonite,,Inner Focus,,Multiscale
-149,Dragonite,Mega Dragonite,???,,
+149,Dragonite,Mega Dragonite,Multiscale,,
 150,Mewtwo,,Pressure,,Unnerve
-150,Mewtwo,Mega Mewtwo X,???,,
-150,Mewtwo,Mega Mewtwo Y,???,,
+150,Mewtwo,Mega Mewtwo X,Steadfast,,
+150,Mewtwo,Mega Mewtwo Y,Insomnia,,
 151,Mew,,Synchronize,,
 152,Chikorita,,Overgrow,,Leaf Guard
 153,Bayleef,,Overgrow,,Leaf Guard
@@ -250,7 +250,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 192,Sunflora,,Chlorophyll,Solar Power,Early Bird
 193,Yanma,,Speed Boost,Compound Eyes,Frisk
 194,Wooper,,Damp,Water Absorb,Unaware
-194,Wooper,Paldean Wooper,???,,
+194,Wooper,Paldean Wooper,Poison Point,Water Absorb,Unaware
 195,Quagsire,,Damp,Water Absorb,Unaware
 196,Espeon,,Synchronize,,Magic Bounce
 197,Umbreon,,Synchronize,,Inner Focus
@@ -507,9 +507,9 @@ Number,Name,Form,Ability1,Ability2,Hidden
 409,Rampardos,,Mold Breaker,,Sheer Force
 410,Shieldon,,Sturdy,,Soundproof
 411,Bastiodon,,Sturdy,,Soundproof
-412,Burmy,Plant Cloak,???,,
-412,Burmy,Sandy Cloak,???,,
-412,Burmy,Trash Cloak,???,,
+412,Burmy,Plant Cloak,Shed Skin,,Overcoat
+412,Burmy,Sandy Cloak,Shed Skin,,Overcoat
+412,Burmy,Trash Cloak,Shed Skin,,Overcoat
 413,Wormadam,Plant Cloak,Anticipation,,Overcoat
 413,Wormadam,Sandy Cloak,Anticipation,,Overcoat
 413,Wormadam,Trash Cloak,Anticipation,,Overcoat
@@ -539,7 +539,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 436,Bronzor,,Levitate,Heatproof,Heavy Metal
 437,Bronzong,,Levitate,Heatproof,Heavy Metal
 438,Bonsly,,Sturdy,Rock Head,Rattled
-439,Mime Jr.,,???,,
+439,Mime Jr.,,Soundproof,Filter,Technician
 440,Happiny,,Natural Cure,Serene Grace,Friend Guard
 441,Chatot,,Keen Eye,Tangled Feet,Big Pecks
 442,Spiritomb,,Pressure,,Infiltrator
@@ -674,8 +674,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 553,Krookodile,,Intimidate,Moxie,Anger Point
 554,Darumaka,,Hustle,,Inner Focus
 554,Darumaka,Galarian Darumaka,Hustle,,Inner Focus
-555,Darmanitan,Galarian Standard Mode,???,,
-555,Darmanitan,Galarian Zen Mode,???,,
+555,Darmanitan,Galarian Standard Mode,Gorilla Tactics,,Zen Mode
+555,Darmanitan,Galarian Zen Mode,Gorilla Tactics,,Zen Mode
 555,Darmanitan,Standard Mode,Sheer Force,,Zen Mode
 555,Darmanitan,Zen Mode,Sheer Force,,Zen Mode
 556,Maractus,,Water Absorb,Chlorophyll,Storm Drain
@@ -717,8 +717,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 589,Escavalier,,Swarm,Shell Armor,Overcoat
 590,Foongus,,Effect Spore,,Regenerator
 591,Amoonguss,,Effect Spore,,Regenerator
-592,Frillish,,???,,
-593,Jellicent,,???,,
+592,Frillish,,Water Absorb,Cursed Body,Damp
+593,Jellicent,,Water Absorb,Cursed Body,Damp
 594,Alomomola,,Healer,Hydration,Regenerator
 595,Joltik,,Compound Eyes,Unnerve,Swarm
 596,Galvantula,,Compound Eyes,Unnerve,Swarm
@@ -793,7 +793,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 656,Froakie,,Torrent,,Protean
 657,Frogadier,,Torrent,,Protean
 658,Greninja,,Torrent,,Protean
-658,Greninja,Ash-Greninja,???,,
+658,Greninja,Ash-Greninja,Battle Bond,,
 659,Bunnelby,,Pickup,Cheek Pouch,Huge Power
 660,Diggersby,,Pickup,Cheek Pouch,Huge Power
 661,Fletchling,,Big Pecks,,Gale Wings
@@ -803,8 +803,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 665,Spewpa,,Shed Skin,,Friend Guard
 666,Vivillon,,Shield Dust,Compound Eyes,Friend Guard
 667,Litleo,,Rivalry,Unnerve,Moxie
-668,Pyroar,,???,,
-669,Flabébé,,???,,
+668,Pyroar,,Rivalry,Unnerve,Moxie
+669,Flabébé,,Flower Veil,,Symbiosis
 670,Floette,,Flower Veil,,Symbiosis
 671,Florges,,Flower Veil,,Symbiosis
 672,Skiddo,,Sap Sipper,,Grass Pelt
@@ -866,13 +866,13 @@ Number,Name,Form,Ability1,Ability2,Hidden
 715,Noivern,,Frisk,Infiltrator,Telepathy
 716,Xerneas,,Fairy Aura,,
 717,Yveltal,,Dark Aura,,
-718,Zygarde,10% Forme,???,,
-718,Zygarde,50% Forme,???,,
+718,Zygarde,10% Forme,Aura Break,Power Construct,
+718,Zygarde,50% Forme,Aura Break,Power Construct,
 718,Zygarde,Complete Forme,Power Construct,,
 719,Diancie,,Clear Body,,
 719,Diancie,Mega Diancie,Magic Bounce,,
-720,Hoopa,Hoopa Confined,???,,
-720,Hoopa,Hoopa Unbound,???,,
+720,Hoopa,Hoopa Confined,Magician,,
+720,Hoopa,Hoopa Unbound,Magician,,
 721,Volcanion,,Water Absorb,,
 722,Rowlet,,Overgrow,,Long Reach
 723,Dartrix,,Overgrow,,Long Reach
@@ -895,13 +895,13 @@ Number,Name,Form,Ability1,Ability2,Hidden
 739,Crabrawler,,Hyper Cutter,Iron Fist,Anger Point
 740,Crabominable,,Hyper Cutter,Iron Fist,Anger Point
 741,Oricorio,Baile Style,Dancer,,
-741,Oricorio,Pa'u Style,???,,
+741,Oricorio,Pa'u Style,Dancer,,
 741,Oricorio,Pom-Pom Style,Dancer,,
 741,Oricorio,Sensu Style,Dancer,,
 742,Cutiefly,,Honey Gather,Shield Dust,Sweet Veil
 743,Ribombee,,Honey Gather,Shield Dust,Sweet Veil
 744,Rockruff,,Keen Eye,Vital Spirit,Steadfast
-744,Rockruff,Own Tempo Rockruff,???,,
+744,Rockruff,Own Tempo Rockruff,Own Tempo,,
 745,Lycanroc,Dusk Form,Tough Claws,,
 745,Lycanroc,Midday Form,Keen Eye,Sand Rush,Steadfast
 745,Lycanroc,Midnight Form,Keen Eye,Vital Spirit,No Guard
@@ -932,14 +932,14 @@ Number,Name,Form,Ability1,Ability2,Hidden
 769,Sandygast,,Water Compaction,,Sand Veil
 770,Palossand,,Water Compaction,,Sand Veil
 771,Pyukumuku,,Innards Out,,Unaware
-772,Type: Null,,???,,
+772,Type: Null,,Battle Armor,,
 773,Silvally,,Rks System,,
-774,Minior,Core Form,???,,
-774,Minior,Meteor Form,???,,
+774,Minior,Core Form,Shields Down,,
+774,Minior,Meteor Form,Shields Down,,
 775,Komala,,Comatose,,
 776,Turtonator,,Shell Armor,,
 777,Togedemaru,,Iron Barbs,Lightning Rod,Sturdy
-778,Mimikyu,,???,,
+778,Mimikyu,,Disguise,,
 779,Bruxish,,Dazzling,Strong Jaw,Wonder Skin
 780,Drampa,,Berserk,Sap Sipper,Cloud Nine
 781,Dhelmise,,Steelworker,,
@@ -1014,7 +1014,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 847,Barraskewda,,Swift Swim,,Propeller Tail
 848,Toxel,,Rattled,Static,Klutz
 849,Toxtricity,Amped Form,Punk Rock,Plus,Technician
-849,Toxtricity,Low Key Form,???,,
+849,Toxtricity,Low Key Form,Punk Rock,Minus,Technician
 850,Sizzlipede,,Flash Fire,White Smoke,Flame Body
 851,Centiskorch,,Flash Fire,White Smoke,Flame Body
 852,Clobbopus,,Limber,,Technician
@@ -1030,8 +1030,8 @@ Number,Name,Form,Ability1,Ability2,Hidden
 862,Obstagoon,,Reckless,Guts,Defiant
 863,Perrserker,,Battle Armor,Tough Claws,Steely Spirit
 864,Cursola,,Weak Armor,,Perish Body
-865,Sirfetch'd,,???,,
-866,Mr. Rime,,???,,
+865,Sirfetch'd,,Steadfast,,Scrappy
+866,Mr. Rime,,Tangled Feet,Screen Cleaner,Ice Body
 867,Runerigus,,Wandering Spirit,,
 868,Milcery,,Sweet Veil,,Aroma Veil
 869,Alcremie,,Sweet Veil,,Aroma Veil
@@ -1044,7 +1044,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 875,Eiscue,Noice Face,Ice Face,,
 876,Indeedee,Female,Own Tempo,Synchronize,Psychic Surge
 876,Indeedee,Male,Inner Focus,Synchronize,Psychic Surge
-877,Morpeko,Full Belly Mode,???,,
+877,Morpeko,Full Belly Mode,Hunger Switch,,
 877,Morpeko,Hangry Mode,Hunger Switch,,
 878,Cufant,,Sheer Force,,Heavy Metal
 879,Copperajah,,Sheer Force,,Heavy Metal
@@ -1057,14 +1057,14 @@ Number,Name,Form,Ability1,Ability2,Hidden
 886,Drakloak,,Clear Body,Infiltrator,Cursed Body
 887,Dragapult,,Clear Body,Infiltrator,Cursed Body
 888,Zacian,Crowned Sword,Intrepid Sword,,
-888,Zacian,Hero of Many Battles,???,,
+888,Zacian,Hero of Many Battles,Intrepid Sword,,
 889,Zamazenta,Crowned Shield,Dauntless Shield,,
-889,Zamazenta,Hero of Many Battles,???,,
+889,Zamazenta,Hero of Many Battles,Dauntless Shield,,
 890,Eternatus,,Pressure,,
 890,Eternatus,Eternamax,Pressure,,
 891,Kubfu,,Inner Focus,,
-892,Urshifu,Rapid Strike Style,???,,
-892,Urshifu,Single Strike Style,???,,
+892,Urshifu,Rapid Strike Style,Unseen Fist,,
+892,Urshifu,Single Strike Style,Unseen Fist,,
 893,Zarude,,Leaf Guard,,
 894,Regieleki,,Transistor,,
 895,Regidrago,,Dragons Maw,,
@@ -1103,17 +1103,17 @@ Number,Name,Form,Ability1,Ability2,Hidden
 922,Pawmo,,Volt Absorb,Natural Cure,Iron Fist
 923,Pawmot,,Volt Absorb,Natural Cure,Iron Fist
 924,Tandemaus,,Run Away,Pickup,Own Tempo
-925,Maushold,Family of Four,???,,
-925,Maushold,Family of Three,???,,
+925,Maushold,Family of Four,Friend Guard,Cheek Pouch,Technician
+925,Maushold,Family of Three,Friend Guard,Cheek Pouch,Technician
 926,Fidough,,Own Tempo,,Klutz
 927,Dachsbun,,Well Baked Body,,Aroma Veil
 928,Smoliv,,Early Bird,,Harvest
 929,Dolliv,,Early Bird,,Harvest
 930,Arboliva,,Seed Sower,,Harvest
-931,Squawkabilly,Blue Plumage,???,,
-931,Squawkabilly,Green Plumage,???,,
-931,Squawkabilly,White Plumage,???,,
-931,Squawkabilly,Yellow Plumage,???,,
+931,Squawkabilly,Blue Plumage,Intimidate,Hustle,Guts
+931,Squawkabilly,Green Plumage,Intimidate,Hustle,Guts
+931,Squawkabilly,White Plumage,Intimidate,Hustle,Sheer Force
+931,Squawkabilly,Yellow Plumage,Intimidate,Hustle,Sheer Force
 932,Nacli,,Purifying Salt,Sturdy,Clear Body
 933,Naclstack,,Purifying Salt,Sturdy,Clear Body
 934,Garganacl,,Purifying Salt,Sturdy,Clear Body
@@ -1185,7 +1185,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 996,Frigibax,,Thermal Exchange,,Ice Body
 997,Arctibax,,Thermal Exchange,,Ice Body
 998,Baxcalibur,,Thermal Exchange,,Ice Body
-999,Gimmighoul,Chest Form,???,,
+999,Gimmighoul,Chest Form,Rattled,,
 999,Gimmighoul,Roaming Form,Run Away,,
 1000,Gholdengo,,Good As Gold,,
 1001,Wo-Chien,,Tablets Of Ruin,,
@@ -1204,17 +1204,17 @@ Number,Name,Form,Ability1,Ability2,Hidden
 1014,Okidogi,,Toxic Chain,,Guard Dog
 1015,Munkidori,,Toxic Chain,,Frisk
 1016,Fezandipiti,,Toxic Chain,,Technician
-1017,Ogerpon,Cornerstone Mask,???,,
-1017,Ogerpon,Hearthflame Mask,???,,
-1017,Ogerpon,Teal Mask,???,,
-1017,Ogerpon,Wellspring Mask,???,,
+1017,Ogerpon,Cornerstone Mask,Sturdy,,
+1017,Ogerpon,Hearthflame Mask,Mold Breaker,,
+1017,Ogerpon,Teal Mask,Defiant,,
+1017,Ogerpon,Wellspring Mask,Water Absorb,,
 1018,Archaludon,,Stamina,Sturdy,Stalwart
 1019,Hydrapple,,Supersweet Syrup,Regenerator,Sticky Hold
 1020,Gouging Fire,,Protosynthesis,,
 1021,Raging Bolt,,Protosynthesis,,
 1022,Iron Boulder,,Quark Drive,,
 1023,Iron Crown,,Quark Drive,,
-1024,Terapagos,Normal Form,???,,
+1024,Terapagos,Normal Form,Tera Shift,,
 1024,Terapagos,Stellar Form,Teraform Zero,,
 1024,Terapagos,Terastal Form,Tera Shell,,
 1025,Pecharunt,,Poison Puppeteer,,

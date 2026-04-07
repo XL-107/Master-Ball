@@ -7,4 +7,4 @@ We have a basic understanding of flutter, but have not yet assembled a final pro
 
 ### NOTES:
 Try not to mix linux and windows installations when working on the project. 
-The android emulator doesn't like being run out of WSL very muchc. 
+The android emulator doesn't like being run out of WSL very much. 

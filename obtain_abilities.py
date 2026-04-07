@@ -43,7 +43,11 @@ def get_all_pokemon():
                 hidden = " ".join(abilities[1]["ability"]["name"].split("-")).title()
                 result += f",{one},,{hidden}\n"
             case _:
-                errorFile.write("invalid: " + pokemon + "\n")
+                errorFile.write("invalid: " + x[2])
+                if (not pd.isnull(x[3])):
+                    errorFile.write(", " + x[3] + "\n")
+                else:
+                    errorFile.write("\n")
                 result += ",???,,\n"
         outputFile.write(result)
 
@@ -159,8 +163,17 @@ def abilityAPI(pokemon, form):
         return data["abilities"]
     return []
 
+def getInvalid():
+    errorFile = open("aaa.txt", "w", encoding="utf-8")
+    inputFile = open("pokemon_abilities.csv", "r", encoding="utf-8")
+    for line in inputFile:
+        if "???" in line:
+            errorFile.write(line)
+
+
+
 
 def main():
-    get_all_pokemon()
+    getInvalid()
 
 main()
