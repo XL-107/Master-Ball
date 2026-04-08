@@ -2,6 +2,7 @@ import 'package:basic_pokedex/dexEntry.dart';
 import 'package:flutter/material.dart';
 import 'pokemon.dart';
 import 'pokeApiService.dart';
+import 'detailedView.dart';
 
 void main() {
   runApp(MainApp());
@@ -17,7 +18,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   final _service = PokeApiService();
   late Future<List<Pokemon>> _pokemonFuture;
-  int currentIndex = 0;
+  Pokemon? currentPokemon;
 
   @override
   void initState() {
@@ -42,17 +43,32 @@ class _MainAppState extends State<MainApp> {
 
             final pokemonList = snapshot.data!; //unwraps future so pokemon list is accessible
             
-            List<DexEntry> dexList = [];
+            List<GestureDetector> dexList = [];
             for(int i = 0; i < pokemonList.length; ++i){ //turns each pokemon into a dexEntry widget so it can be used in gridView
-              dexList.add(DexEntry(pokemonEntry: pokemonList[i]));
-            }
-            
-            return Center(
-              child: 
-                GridView.count(
-                  crossAxisCount: 5,
-                  children: dexList,
+              dexList.add(
+                GestureDetector(
+                  onTap: (){
+                    setState((){
+                      currentPokemon = pokemonList[i];
+                    });
+                  },
+                  child: DexEntry(pokemonEntry: pokemonList[i]),
                 ),
+              );
+            }
+
+            return Column(
+              children: [
+                if(currentPokemon != null)
+                  DetailedView(pokemonEntry: currentPokemon!),
+                Expanded(
+                  child: 
+                    GridView.count(
+                      crossAxisCount: 5, //number of columns
+                      children: dexList,
+                    ),
+                ),
+              ],
             );
           },
         ),

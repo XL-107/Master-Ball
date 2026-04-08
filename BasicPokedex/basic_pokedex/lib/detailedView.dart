@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
 import 'pokemon.dart';
 
-class DexEntry extends StatelessWidget {
-  
+class DetailedView extends StatelessWidget {
+
   final Pokemon pokemonEntry;
 
-  const DexEntry({
+  const DetailedView({
     super.key,
     required this.pokemonEntry,
   });
 
   @override
   Widget build(BuildContext context){
-    return Center(
+    return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Color.from(alpha: 100, red: 100, green: 0, blue: 100),
-              border: Border.all(
-                color: Colors.black,
-                width: 2.0,
-              )
-            ),
+          SizedBox(
+            width: 200,
+            height: 200,
             child: Image.network(
               pokemonEntry.imageUrl,
               fit: BoxFit.contain,
