@@ -183,51 +183,23 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
   List<String> pokemonNames = [];
   Map<String, Pokemon> pokemonMap = {};
-  Map<String, int> totalWeaks = {
-    'Normal': 0,
-    'Fire': 0,
-    'Water': 0,
-    'Electric': 0,
-    'Grass': 0,
-    'Ice': 0,
-    'Fighting': 0,
-    'Poison': 0,
-    'Ground': 0,
-    'Flying': 0,
-    'Psychic': 0,
-    'Bug': 0,
-    'Rock': 0,
-    'Ghost': 0,
-    'Dragon': 0,
-    'Dark': 0,
-    'Steel': 0,
-    'Fairy': 0,
-  };
-  Map<String, int> totalResists = {
-    'Normal': 0,
-    'Fire': 0,
-    'Water': 0,
-    'Electric': 0,
-    'Grass': 0,
-    'Ice': 0,
-    'Fighting': 0,
-    'Poison': 0,
-    'Ground': 0,
-    'Flying': 0,
-    'Psychic': 0,
-    'Bug': 0,
-    'Rock': 0,
-    'Ghost': 0,
-    'Dragon': 0,
-    'Dark': 0,
-    'Steel': 0,
-    'Fairy': 0,
-  };
   String getTypeAsset(String type) {
     return 'assets/type_logos/$type.png';
   }
-  String getPokemonImage(String pokemon) {
-    return 'play.pokemonshowdown.com/sprites/gen5/${pokemon.toLowerCase()}.png';
+  String getPokemonImage(int dexNum) {
+    //'https://play.pokemonshowdown.com/sprites/gen5/${pokemon}.png'
+    String dex = dexNum.toString();
+    if (dexNum < 10) {
+      dex = '000$dex';
+    }else if (dexNum < 100) {
+      dex = '00$dex';
+    }else if (dexNum < 1000) {
+      dex = '0$dex';
+    }
+    return 'https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/$dex/Normal.png';
+  }
+  String showdownFormatting(String pokemon) {
+    return pokemon.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
   Future<void> loadPokemon() async {
     for (var name in pokemonNames) {
@@ -266,6 +238,46 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
 
   @override
   Widget build(BuildContext context) {
+      Map<String, int> totalWeaks = {
+      'Normal': 0,
+      'Fire': 0,
+      'Water': 0,
+      'Electric': 0,
+      'Grass': 0,
+      'Ice': 0,
+      'Fighting': 0,
+      'Poison': 0,
+      'Ground': 0,
+      'Flying': 0,
+      'Psychic': 0,
+      'Bug': 0,
+      'Rock': 0,
+      'Ghost': 0,
+      'Dragon': 0,
+      'Dark': 0,
+      'Steel': 0,
+      'Fairy': 0,
+    };
+    Map<String, int> totalResists = {
+      'Normal': 0,
+      'Fire': 0,
+      'Water': 0,
+      'Electric': 0,
+      'Grass': 0,
+      'Ice': 0,
+      'Fighting': 0,
+      'Poison': 0,
+      'Ground': 0,
+      'Flying': 0,
+      'Psychic': 0,
+      'Bug': 0,
+      'Rock': 0,
+      'Ghost': 0,
+      'Dragon': 0,
+      'Dark': 0,
+      'Steel': 0,
+      'Fairy': 0,
+    };
     return MaterialApp(
       // MaterialApp with debugShowCheckedModeBanner false and home
       debugShowCheckedModeBanner: false,
@@ -331,9 +343,39 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
                             columns: [
-                              ...pokemonNames.map((name) => DataColumn(label: Text(name))),
-                              DataColumn(label: Text('Total Weaks')),
-                              DataColumn(label: Text('Total Resists')),
+                              ...pokemonNames.map((name) {
+                                final pokemon = pokemonMap[name];
+                                return DataColumn(
+                                  label:
+                                  SizedBox(
+                                    width: 60,
+                                    height: 60,
+                                    child: Center(
+                                      child: pokemon != null ? Image.network(
+                                        getPokemonImage(pokemon.id),
+                                        width: 60,
+                                        height: 60,
+                                      )
+                                      : const SizedBox(width: 60, height: 60),
+                                    ),
+                                  ) 
+                                   // fallback UI
+                                );
+                              }),
+                              DataColumn(
+                                label: SizedBox(
+                                  width: 80,
+                                  height: 80,
+                                  child:Center(child: Text('Total Weaks')),
+                                )
+                              ),
+                              DataColumn(
+                                label: SizedBox(
+                                  width: 80,
+                                  height: 80,
+                                  child:Center(child: Text('Total Resists')),
+                                )
+                              ),
                             ],
 
                             rows: typeNames.map((type) {
@@ -350,10 +392,31 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                     }else if (matchup > 1.0){
                                       totalWeaks[type] = (totalWeaks[type] ?? 0) + 1;
                                     }
-                                    return DataCell(Text(matchup.toString()));
+                                    return DataCell(
+                                      SizedBox(
+                                        width: 32,
+                                        child: Center(
+                                          child: Text(matchup.toString()),
+                                        )
+                                      )
+                                    );
                                   }),
-                                  DataCell(Text(totalWeaks[type].toString())),
-                                  DataCell(Text(totalResists[type].toString())),
+                                  DataCell(
+                                    SizedBox(
+                                      width: 64,
+                                      child: Center(
+                                        child: Text(totalWeaks[type].toString()),
+                                      )
+                                    )
+                                  ),
+                                  DataCell(
+                                    SizedBox(
+                                      width: 64,
+                                      child: Center(
+                                        child: Text(totalResists[type].toString()),
+                                      )
+                                    )
+                                  ),
                                 ],
                               );
                             }).toList(),
