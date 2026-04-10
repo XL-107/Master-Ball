@@ -42,18 +42,38 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Pokemon Test")),
-      body: ListView.builder(
-        itemCount: pokemon.length,
-        itemBuilder: (context, index) {
-          final p = pokemon[index];
-          return ListTile(
-            title: Text(p["Name"]),
-            subtitle: Text("#${p["Number"]}"),
-          );
-        },
-      ),
-    );
-  }
+  return Scaffold(
+    appBar: AppBar(title: const Text("Pokemon Search")),
+    body: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            decoration: const InputDecoration(
+              labelText: "Search Pokemon",
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) async {
+              final results = await repo.searchByName(value);
+              setState(() {
+                pokemon = results;
+              });
+            },
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: pokemon.length,
+            itemBuilder: (context, index) {
+              final p = pokemon[index];
+              return ListTile(
+                title: Text(p["Name"]),
+                subtitle: Text("#${p["Number"]}"),
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
 }
