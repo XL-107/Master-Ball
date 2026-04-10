@@ -26,6 +26,7 @@ class PokemonListPage extends StatefulWidget {
 class _PokemonListPageState extends State<PokemonListPage> {
   final repo = PokemonRepository();
   List<Map<String, dynamic>> pokemon = [];
+  String selectedType = "All";
 
   @override
   void initState() {
@@ -34,46 +35,92 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> loadPokemon() async {
-    final results = await repo.searchByName("Char");
+    final results = await repo.searchByName("");
     setState(() {
       pokemon = results;
     });
   }
 
+  Future<void> searchPokemon(String value) async {
+    final results = await repo.searchByName(value);
+    setState(() {
+      pokemon = results;
+    });
+  }
+
+  Future<void> filterPokemonByType(String type) async {
+    if (type == "All") {
+      final results = await repo.searchByName("");
+      setState(() {
+        pokemon = results;
+      });
+    } else {
+      final results = await repo.filterByType(type);
+      setState(() {
+        pokemon = results;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(title: const Text("Pokemon Search")),
-    body: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            decoration: const InputDecoration(
-              labelText: "Search Pokemon",
-              border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(title: const Text("Pokemon Search")),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                labelText: "Search Pokemon",
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) async {
+                await searchPokemon(value);
+              },
             ),
-            onChanged: (value) async {
-              final results = await repo.searchByName(value);
-              setState(() {
-                pokemon = results;
-              });
-            },
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: pokemon.length,
-            itemBuilder: (context, index) {
-              final p = pokemon[index];
-              return ListTile(
-                title: Text(p["Name"]),
-                subtitle: Text("#${p["Number"]}"),
+          DropdownButton<String>(
+            value: selectedType,
+            items: [
+              "All",
+              "Fire",
+              "Water",
+              "Grass",
+              "Electric",
+              "Psychic",
+              "Ice",
+              "Dragon",
+            ].map((type) {
+              return DropdownMenuItem<String>(
+                value: type,
+                child: Text(type),
               );
+            }).toList(),
+            onChanged: (value) async {
+              if (value == null) return;
+
+              setState(() {
+                selectedType = value;
+              });
+
+              await filterPokemonByType(value);
             },
           ),
-        ),
-      ],
-    ),
-  );
+          Expanded(
+            child: ListView.builder(
+              itemCount: pokemon.length,
+              itemBuilder: (context, index) {
+                final p = pokemon[index];
+                return ListTile(
+                  title: Text(p["Name"]),
+                  subtitle: Text("#${p["Number"]}"),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
