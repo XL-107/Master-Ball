@@ -188,7 +188,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   }
   String getPokemonImage(int dexNum) {
     //'https://play.pokemonshowdown.com/sprites/gen5/${pokemon}.png'
-    String dex = dexNum.toString();
+    /*String dex = dexNum.toString();
     if (dexNum < 10) {
       dex = '000$dex';
     }else if (dexNum < 100) {
@@ -196,7 +196,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     }else if (dexNum < 1000) {
       dex = '0$dex';
     }
-    return 'https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/$dex/Normal.png';
+    return 'https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/$dex/Normal.png';*/
+    return 'assets/icons/icon_$dexNum.png';
   }
   String showdownFormatting(String pokemon) {
     return pokemon.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
@@ -284,6 +285,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
       theme: ThemeData.dark(),
       home: Scaffold(
         // Scaffold with appbar ans body.
+        backgroundColor: Colors.purple,
         appBar: AppBar(
           title: Text('Pokemon Type Chart'),
         ),
@@ -323,6 +325,10 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DataTable(
+                        border: TableBorder.all(
+                          width: 1.0,
+                          color: Colors.black,
+                        ),
                         columns: const [
                           DataColumn(label: Text('Type')),
                         ],
@@ -342,6 +348,10 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
+                            border: TableBorder.all(
+                              width: 1.0,
+                              color: Colors.black,
+                            ),
                             columns: [
                               ...pokemonNames.map((name) {
                                 final pokemon = pokemonMap[name];
@@ -351,7 +361,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                     width: 60,
                                     height: 60,
                                     child: Center(
-                                      child: pokemon != null ? Image.network(
+                                      child: pokemon != null ? Image.asset(
                                         getPokemonImage(pokemon.id),
                                         width: 60,
                                         height: 60,
