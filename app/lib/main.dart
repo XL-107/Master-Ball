@@ -1,3 +1,5 @@
+import 'pokemon_detail_page.dart';
+
 import 'package:flutter/material.dart';
 import 'data/pokemon_repository.dart';
 
@@ -115,6 +117,14 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 return ListTile(
                   title: Text(p["Name"]),
                   subtitle: Text("#${p["Number"]}"),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PokemonDetailPage(pokemon: p),
+                      ),
+                    );
+                  },
                 );
               },
             ),
