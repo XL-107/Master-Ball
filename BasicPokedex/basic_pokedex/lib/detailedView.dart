@@ -20,11 +20,10 @@ class DetailedView extends StatelessWidget {
             width: 200,
             height: 200,
             child: Image.network(
-              pokemonEntry.imageUrl,
+              'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonEntry.number}.png',
               fit: BoxFit.contain,
             ),
           ),
-          // Text(intTo(pokemonEntry.id)),
         ],
       ),
     ); 

@@ -18,14 +18,14 @@ class DexEntry extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Color.from(alpha: 100, red: 100, green: 0, blue: 100),
+              color: Color.fromARGB(255, 177, 67, 240),
               border: Border.all(
                 color: Colors.black,
                 width: 2.0,
               )
             ),
             child: Image.network(
-              pokemonEntry.imageUrl,
+              'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonEntry.number}.png',
               fit: BoxFit.contain,
             ),
           ),

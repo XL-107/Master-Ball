@@ -1,8 +1,7 @@
-import 'package:basic_pokedex/dexEntry.dart';
 import 'package:flutter/material.dart';
 import 'pokemon.dart';
-import 'pokeApiService.dart';
 import 'detailedView.dart';
+import 'dbaccess.dart';
 
 void main() {
   runApp(MainApp());
@@ -16,61 +15,61 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  final _service = PokeApiService();
-  late Future<List<Pokemon>> _pokemonFuture;
+  final _db = DatabaseAccess();
   Pokemon? currentPokemon;
-
-  @override
-  void initState() {
-    super.initState();
-    _pokemonFuture = _service.fetchOriginal151(); //fetches og 151 pokemon on initilization
-  }
+  final int pokemonCount = 151;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Pokedex')),
-        body: FutureBuilder<List<Pokemon>>(
-          future: _pokemonFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator()); //loading circle while waiting for api
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}')); //if theres an error
-            }
-
-            final pokemonList = snapshot.data!; //unwraps future so pokemon list is accessible
-            
-            List<GestureDetector> dexList = [];
-            for(int i = 0; i < pokemonList.length; ++i){ //turns each pokemon into a dexEntry widget so it can be used in gridView
-              dexList.add(
-                GestureDetector(
-                  onTap: (){
-                    setState((){
-                      currentPokemon = pokemonList[i];
+        body: Column(
+          children: [
+            if (currentPokemon != null)
+              DetailedView(pokemonEntry: currentPokemon!),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5,
+                ),
+                itemCount: pokemonCount,
+                itemBuilder: (context, index) {
+                final pokemonNumber = index + 1;
+                return GestureDetector(
+                  onTap: () async {
+                    final pokemon = await _db.getPokemonAtIndex(index);
+                    setState(() {
+                      currentPokemon = pokemon;
                     });
                   },
-                  child: DexEntry(pokemonEntry: pokemonList[i]),
-                ),
-              );
-            }
-
-            return Column(
-              children: [
-                if(currentPokemon != null)
-                  DetailedView(pokemonEntry: currentPokemon!),
-                Expanded(
-                  child: 
-                    GridView.count(
-                      crossAxisCount: 5, //number of columns
-                      children: dexList,
-                    ),
-                ),
-              ],
-            );
-          },
+                  child: Stack(
+                    children: [
+                      Image.network(
+                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Text(
+                          pokemonNumber.toString().padLeft(4, '0'),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              ),
+            ),
+          ],
         ),
       ),
     );
