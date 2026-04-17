@@ -15,6 +15,8 @@ class DatabaseAccess{
   final int maxLoaded = 100; //the most that should be loaded in either direction of the current index
   late List<Pokemon> loaded;
   String sortMethod = "Number"; //keeps track of what the loaded variable is currently sorted by; it is pokemon ID by default
+  static Database? _cachedDb; //singleton pattern to avoid reopening database
+  static bool _viewCreated = false;
 
   //init
   DatabaseAccess(){
@@ -23,6 +25,11 @@ class DatabaseAccess{
 
   //funcs
   Future<Database> initDB() async {
+    // Return cached database if already initialized
+    if (_cachedDb != null) {
+      return _cachedDb!;
+    }
+
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final dbPath = join(documentsDirectory.path, "MBDB.db");
 
@@ -38,9 +45,15 @@ class DatabaseAccess{
 
     //open the database (we're only reading it, but readonly has to be false for creating table view)
     final db = await openDatabase(dbPath, readOnly: false);
-    db.execute('DROP VIEW IF EXISTS pokemon_with_total');
-    db.execute('CREATE VIEW pokemon_with_total AS SELECT *, (HP + Attack + Defense + "SP.Attack" + "SP.Defense" + Speed) AS Total FROM expanded_pokemon_test');
     
+    // Only create view once
+    if (!_viewCreated) {
+      await db.execute('DROP VIEW IF EXISTS pokemon_with_total');
+      await db.execute('CREATE VIEW pokemon_with_total AS SELECT *, (HP + Attack + Defense + "SP.Attack" + "SP.Defense" + Speed) AS Total FROM expanded_pokemon_test');
+      _viewCreated = true;
+    }
+    
+    _cachedDb = db;
     return db;
   }
 

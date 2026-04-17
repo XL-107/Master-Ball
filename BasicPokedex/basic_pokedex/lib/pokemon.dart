@@ -1,40 +1,3 @@
-/*class Pokemon{
-  final int id;
-  final String name;
-  final List<String> types;
-  final 
-  
-  Pokemon({ //pokemon class constructor
-    required this.id,
-    required this.name,
-    required this.types,
-    required this.imageUrl,
-  });
-
-   factory Pokemon.fromJson(Map<String, dynamic> json) { //factory contructor parses json and uses regular constructor
-
-    List<String> typeList = []; //loops through types in json to add to typeList array
-    for(var t in json['types'] as List){
-      typeList.add(t['type']['name'] as String);
-    }
-
-    return Pokemon( //passes json info to constructor
-      id: json['id'],
-      name: json['name'],
-      types: typeList,
-      imageUrl: json['sprites']['other']['official-artwork']['front_default'] ?? 
-                json['sprites']['front_default'],
-    );
-  }
-
-  
-
-  @override
-  String toString() {
-    return 'ID: $id, Name: $name, Type(s): $types';
-  }
-}*/
-
 class Pokemon {
   int number;
   String name;
@@ -50,8 +13,29 @@ class Pokemon {
     return name + ((form == null || form == "") ? "" : ": $form");
   }
 
-  String get getName{
-    return name;
+  String apiTypeMatch(int index){
+    String type = typing[index].toLowerCase();
+    return switch(type){
+      'normal' => '1',
+      'fighting' => '2',
+      'flying' => '3',
+      'poison' => '4',
+      'ground' => '5',
+      'rock' => '6',
+      'bug' => '7',
+      'ghost' => '8',
+      'steel' => '9',
+      'fire' => '10',
+      'water' => '11',
+      'grass' => '12',
+      'electric' => '13',
+      'psychic' => '14',
+      'ice' => '15',
+      'dragon' => '16',
+      'dark' => '17',
+      'fairy' => '18',
+      _ => 'unknown',
+    };
   }
 }
 

@@ -24,7 +24,7 @@ class SearchBarApp extends StatefulWidget {
     }
     List<MapEntry<int, Pokemon>> nameSuggestions = [];
     for(int i = 0; i < dex.length; ++i){ //returns all pokemon starting with first letter of input and containing input
-      if(dex[i].getName[0].toLowerCase() == input[0] && dex[i].getName.toLowerCase().contains(input)){
+      if(dex[i].getNameWithForm()[0].toLowerCase() == input[0] && dex[i].getNameWithForm().toLowerCase().contains(input)){
         nameSuggestions.add(MapEntry(i, dex[i]));
       }
     }
@@ -67,10 +67,10 @@ class _SearchBarAppState extends State<SearchBarApp> {
                 final index = entry.key;
                 final pokemon = entry.value;
                 return ListTile(
-                  title: Text(pokemon.getName),
+                  title: Text(pokemon.getNameWithForm()),
                   onTap: () {
                     setState(() {
-                      controller.closeView(pokemon.getName);
+                      controller.closeView(pokemon.getNameWithForm());
                       widget.onPokemonSelected(index);
                     });
                   },
