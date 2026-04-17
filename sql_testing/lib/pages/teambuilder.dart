@@ -186,8 +186,10 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   String getTypeAsset(String type) {
     return 'assets/type_logos/$type.png';
   }
+  String getPokemonSprite(String pokemonName){
+    return 'https://play.pokemonshowdown.com/sprites/gen5/${showdownFormatting(pokemonName)}.png';
+  }
   String getPokemonImage(int dexNum) {
-    //'https://play.pokemonshowdown.com/sprites/gen5/${pokemon}.png'
     /*String dex = dexNum.toString();
     if (dexNum < 10) {
       dex = '000$dex';
@@ -235,6 +237,39 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     setState(() {
       allTypes = data;
     });
+  }
+
+  Widget teamBanner() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 30),
+      decoration: BoxDecoration(
+        color: Color(0xFF311432),
+        border: Border.all(color: Color(0xFFF81894), width: 3),
+      ),
+      child: Column(
+        children: [
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 12,
+            children: pokemonNames.map((name) {
+              final pokemon = pokemonMap[name];
+
+              if (pokemon == null) {
+                return SizedBox(width: 100, height: 100);
+              }
+
+              return Image.network(
+                getPokemonSprite(pokemon.name),
+                width: 100,
+                height: 100,
+                fit: BoxFit.contain,
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -287,7 +322,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
         // Scaffold with appbar ans body.
         backgroundColor: Colors.purple,
         appBar: AppBar(
-          title: Text('Pokemon Type Chart'),
+          title: Text('Teambuilder'),
         ),
         body: Column(
           children: [
@@ -312,6 +347,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
               },
               child: Text('Build Team'),
             ),
+            teamBanner(),
             Expanded(
               child: pokemonNames.isEmpty ? const Center(
                 child: Text(
@@ -358,15 +394,15 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                 return DataColumn(
                                   label:
                                   SizedBox(
-                                    width: 60,
-                                    height: 60,
+                                    width: 32,
+                                    height: 32,
                                     child: Center(
                                       child: pokemon != null ? Image.asset(
                                         getPokemonImage(pokemon.id),
-                                        width: 60,
-                                        height: 60,
+                                        width: 32,
+                                        height: 32,
                                       )
-                                      : const SizedBox(width: 60, height: 60),
+                                      : const SizedBox(width: 32, height: 32),
                                     ),
                                   ) 
                                    // fallback UI
@@ -374,16 +410,16 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                               }),
                               DataColumn(
                                 label: SizedBox(
-                                  width: 80,
-                                  height: 80,
-                                  child:Center(child: Text('Total Weaks')),
+                                  width: 100,
+                                  height: 64,
+                                  child:Center(child: Text('Total Weaks', style: TextStyle(fontSize: 14))),
                                 )
                               ),
                               DataColumn(
                                 label: SizedBox(
-                                  width: 80,
-                                  height: 80,
-                                  child:Center(child: Text('Total Resists')),
+                                  width: 100,
+                                  height: 64,
+                                  child:Center(child: Text('Total Resists', style: TextStyle(fontSize: 14))),
                                 )
                               ),
                             ],
@@ -405,7 +441,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                     return DataCell(
                                       SizedBox(
                                         width: 32,
-                                        child: Center(
+                                        child: Align(
+                                          alignment: Alignment.center,
                                           child: Text(matchup.toString()),
                                         )
                                       )
@@ -414,7 +451,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                   DataCell(
                                     SizedBox(
                                       width: 64,
-                                      child: Center(
+                                      child: Align(
+                                        alignment: Alignment.center,
                                         child: Text(totalWeaks[type].toString()),
                                       )
                                     )
@@ -422,7 +460,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                   DataCell(
                                     SizedBox(
                                       width: 64,
-                                      child: Center(
+                                      child: Align(
+                                        alignment: Alignment.center,
                                         child: Text(totalResists[type].toString()),
                                       )
                                     )
