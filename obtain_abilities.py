@@ -7,6 +7,7 @@ import pandas as pd
 
 def get_all_pokemon():
     outputFile = open("pokemon_abilities.csv", "w", encoding="utf-8")
+    errorFile = open("errorfile.csv", "w", encoding="utf-8")
     outputFile.write("Number,Name,Form,Ability1,Ability2,Hidden\n")
 
     query = "SELECT Number, Name, Form FROM expanded_pokemon_test"
@@ -54,6 +55,7 @@ def get_all_pokemon():
                 # This also applies if the pokemon HAS no ability, 
                 # such as the new Megas added in Legends:ZA.
                 result += ",???,,\n"
+                errorFile.write(result)
         outputFile.write(result)
     return
 
@@ -73,6 +75,8 @@ def abilityAPI(pokemon, form):
             form_url = "-hisui"
         case "Paldean": # This handles... only wooper, because tauros is a special case. 
             form_url = "-paldea"
+        case "Partner": # Handles the starters from Let's Go Pikachu/Eevee. 
+            form_url = "-starter"
         # Future regions can be added as needed. 
         case _:
             # Given some other form, just use the form itself in the URL. 

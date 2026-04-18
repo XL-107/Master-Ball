@@ -92,7 +92,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 069,Bellsprout,,Chlorophyll,,Gluttony
 070,Weepinbell,,Chlorophyll,,Gluttony
 071,Victreebel,,Chlorophyll,,Gluttony
-071,Victreebel,Mega Victreebel,???,,
+071,Victreebel,Mega Victreebel,Innards Out,,
 072,Tentacool,,Clear Body,Liquid Ooze,Rain Dish
 073,Tentacruel,,Clear Body,Liquid Ooze,Rain Dish
 074,Geodude,,Rock Head,Sturdy,Sand Veil
@@ -840,7 +840,7 @@ Number,Name,Form,Ability1,Ability2,Hidden
 699,Aurorus,,Refrigerate,,Snow Warning
 700,Sylveon,,Cute Charm,,Pixilate
 701,Hawlucha,,Limber,Unburden,Mold Breaker
-701,Hawlucha,Mega Hawlucha,???,,
+701,Hawlucha,Mega Hawlucha,No Guard,,
 702,Dedenne,,Cheek Pouch,Pickup,Plus
 703,Carbink,,Clear Body,,Sturdy
 704,Goomy,,Sap Sipper,Hydration,Gooey
