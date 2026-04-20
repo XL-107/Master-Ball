@@ -488,20 +488,53 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      //Pokemon name input
                       TextField(
                         controller: controllers[index],
                         decoration: InputDecoration(
                           labelText: 'Pokemon ${index + 1}',
                         ),
-                        onChanged: (value) {
-                          print("TEXT FIELD TRIGGERED");
-                          loadPokemonData(index, value);
+                        onChanged: (value) async {
+                          if (value.length <= 2) return;
+
+                          final name = value.trim();
+
+                          final forms = await getForms(name);
+                          final pokemon = await getPokemon(name);
+
+                          setState(() {
+                            // set forms
+                            availableForms[index] = forms;
+
+                            // default selected form
+                            selectedForms[index] =
+                                forms.isNotEmpty ? forms.first : null;
+
+                            // set abilities from base form
+                            if (pokemon != null) {
+                              availableAbilities[index] = [
+                                pokemon.ability1,
+                                if (pokemon.ability2 != 'None') pokemon.ability2,
+                                if (pokemon.abilityH != 'None') pokemon.abilityH,
+                              ];
+
+                              selectedAbilities[index] =
+                                  availableAbilities[index].isNotEmpty
+                                      ? availableAbilities[index].first
+                                      : null;
+                            } else {
+                              availableAbilities[index] = [];
+                              selectedAbilities[index] = null;
+                            }
+                          });
                         },
                       ),
 
                       const SizedBox(height: 6),
-                      if (availableForms[index].length > 1) 
-                        DropdownButton<String> (
+
+                      //Form dropdown
+                      if (availableForms[index].length > 1)
+                        DropdownButton<String>(
                           isExpanded: true,
                           value: selectedForms[index] ?? availableForms[index].first,
                           hint: const Text("Form"),
@@ -511,17 +544,42 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                               child: Text(form),
                             );
                           }).toList(),
-                          onChanged: (value) {
+                          onChanged: (value) async {
                             setState(() {
                               selectedForms[index] = value;
+                            });
+
+                            final pokemon = await getPokemon(
+                              controllers[index].text.trim(),
+                              form: value == 'None' ? null : value,
+                            );
+
+                            setState(() {
+                              if (pokemon != null) {
+                                availableAbilities[index] = [
+                                  pokemon.ability1,
+                                  if (pokemon.ability2 != 'None') pokemon.ability2,
+                                  if (pokemon.abilityH != 'None') pokemon.abilityH,
+                                ];
+
+                                selectedAbilities[index] =
+                                    availableAbilities[index].isNotEmpty
+                                        ? availableAbilities[index].first
+                                        : null;
+                              } else {
+                                availableAbilities[index] = [];
+                                selectedAbilities[index] = null;
+                              }
                             });
                           },
                         ),
 
-                      if (availableAbilities[index].isNotEmpty) 
-                        DropdownButton<String> (
+                      //Ability dropdown
+                      if (availableAbilities[index].isNotEmpty)
+                        DropdownButton<String>(
                           isExpanded: true,
-                          value: selectedAbilities[index] ?? availableAbilities[index].first,
+                          value: selectedAbilities[index] ??
+                              availableAbilities[index].first,
                           hint: const Text("Ability"),
                           items: availableAbilities[index].map((ability) {
                             return DropdownMenuItem(
@@ -533,9 +591,9 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                             setState(() {
                               selectedAbilities[index] = value;
                             });
-                          }
+                          },
                         ),
-                    ]
+                    ],
                   ),
                 );
               }),
