@@ -9,6 +9,30 @@ var typeNames = [
   'Fighting','Poison','Ground','Flying','Psychic',
   'Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'
 ];
+Map<String, List<String>> immuneAbilities = {
+  'Dry Skin': ['Water'],
+  'Earth Eater': ['Ground'],
+  'Flash Fire': ['Fire'],
+  'Levitate': ['Ground'],
+  'Lightning Rod': ['Electric'],
+  'Sap Sipper': ['Grass'],
+  'Storm Drain': ['Water'],
+  'Volt Absorb': ['Electric'],
+  'Water Absorb': ['Water'],
+  'Wonder Guard': [
+    'Poison', 
+    'Ground', 
+    'Bug', 
+    'Steel', 
+    'Water',
+    'Grass',
+    'Electric',
+    'Psychic',
+    'Ice',
+    'Dragon',
+    'Fairy'
+  ]
+};
 Future<Database> initDatabaseType() async {
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'type_chart.db');
@@ -153,7 +177,7 @@ class Pokemon {
 //Helper function that calculates the type matchup for an individual Pokemon against a singular offensive type. It will always
 //find the defensive matchup for a Pokemon's primary type but if it does have one more type, it will multiply the secondary type's
 //defensive matchup with the offensive type's.
-double getDefMatchup(String primary, String secondary, String offense, List<Type> allTypes){
+double getDefMatchup(String primary, String secondary, String? ability, String offense, List<Type> allTypes){
   final offensiveType = allTypes.firstWhere(
     (t) => t.type == offense,
   );
@@ -168,9 +192,12 @@ double getDefMatchup(String primary, String secondary, String offense, List<Type
     );
     multiplier *= secondaryType.typeMatchups[attackIndex];
   }
+  if (immuneAbilities[ability]?.contains(offense) ?? false) {
+    return 0.0;
+  }
   return multiplier;
 }
-//Helper function that gets a Pokemon's typing
+//Takes the Pokemon's name and form (if specified) and returns the Pokemon class version that has all of its information
 Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
   final pokemonDb = await initDatabasePokemon();
   final abilityDb = await initDatabaseAbilities();
@@ -208,7 +235,7 @@ Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
 
   final abilityRow = abilityResult.isNotEmpty ? abilityResult.first : null;
 
-  // 🔹 3. Combine into ONE Pokemon object
+  //Combine into ONE Pokemon object
   return Pokemon(
     id: base['Number'] as int,
     name: base['Name'] as String,
@@ -283,6 +310,11 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   String showdownFormatting(String pokemon) {
     return pokemon.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
+  List<String> getImmuneAbilities(List<String> abilities) {
+    return abilities.where((ability) {
+      return immuneAbilities.containsKey(ability);
+    }).toList();
+  }
   Future<void> loadPokemon() async {
     for (var name in pokemonNames) {
       final p = await getPokemon(name);
@@ -308,7 +340,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     super.initState();
     loadTypes();
     loadPokemon();
-    print(pokemonMap);
+    //print(pokemonMap);
   }
 
   void loadTypes() async {
@@ -322,21 +354,22 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     final forms = await getForms(name);
     final pokemon = await getPokemon(name);
 
-    print("---- DEBUG START ----");
+    /*print("---- DEBUG START ----");
     print("Input name: $name");
     print("Forms fetched: $forms");
     print("Forms length: ${forms.length}");
-    print("Pokemon fetched: $pokemon");
+    print("Pokemon fetched: $pokemon");*/
 
     setState(() {
       availableForms[index] = forms;
 
       if (pokemon != null) {
-        availableAbilities[index] = [
+        final allAbilities = [
           pokemon.ability1,
           if (pokemon.ability2 != 'None') pokemon.ability2,
           if (pokemon.abilityH != 'None') pokemon.abilityH
         ];
+        availableAbilities[index] = allAbilities;
       } else {
         availableAbilities[index] = [];
       }
@@ -346,9 +379,9 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
       selectedAbilities[index] = availableAbilities[index].isNotEmpty ? availableAbilities[index].first: null;
     });
 
-    print("availableForms[$index]: ${availableForms[index]}");
+    /*print("availableForms[$index]: ${availableForms[index]}");
     print("availableAbilities[$index]: ${availableAbilities[index]}");
-    print("---- DEBUG END ----");
+    print("---- DEBUG END ----");*/
   }
 
   Widget teamBanner() {
@@ -690,7 +723,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                     if (pokemon == null) {
                                       return const DataCell(Text('N/A'));
                                     }
-                                    final matchup = getDefMatchup(pokemon.type1, pokemon.type2, type, allTypes);
+                                    final ability = selectedAbilities[pokemonNames.indexOf(name)];
+                                    final matchup = getDefMatchup(pokemon.type1, pokemon.type2, ability, type, allTypes);
                                     if (matchup < 1.0) {
                                       totalResists[type] = (totalResists[type] ?? 0) + 1;
                                     }else if (matchup > 1.0){
