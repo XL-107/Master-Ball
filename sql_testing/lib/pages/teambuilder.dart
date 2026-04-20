@@ -178,11 +178,10 @@ Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
   // normalize form
   final normalizedForm = (form == null || form == '') ? null : form;
 
-  // 🔹 1. Fetch base Pokémon (types, etc.)
   final pokemonResult = await pokemonDb.query(
     'expanded_pokemon_test',
     where: normalizedForm == null
-        ? 'Name = ? AND (Form IS NULL OR Form = ?)'
+        ? 'Name = ? AND Form IS NULL'
         : 'Name = ? AND Form = ?',
     whereArgs: normalizedForm == null
         ? [pokemonName]
@@ -196,11 +195,10 @@ Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
 
   final base = pokemonResult.first;
 
-  // 🔹 2. Fetch abilities
   final abilityResult = await abilityDb.query(
     'pokemon_abilities',
     where: normalizedForm == null
-        ? 'Name = ? AND (Form IS NULL OR Form = ?)'
+        ? 'Name = ? AND FORM IS NULL'
         : 'Name = ? AND Form = ?',
     whereArgs: normalizedForm == null
         ? [pokemonName]
@@ -222,6 +220,31 @@ Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
     abilityH: (abilityRow?['Hidden'] ?? 'None') as String,
   );
 }
+Future<List<String>> getForms(String pokemonName) async {
+  final db = await initDatabasePokemon();
+
+  final result = await db.query(
+    'expanded_pokemon_test',
+    columns: ['Form'],
+    where: 'Name = ?',
+    whereArgs: [pokemonName],
+  );
+
+  final formSet = result.map((row) {
+    final form = row['Form'] as String?;
+    return form ?? 'None';
+  }).toSet();
+
+  final forms = formSet.toList();
+
+  forms.sort((a, b) {
+    if (a == 'None') return -1;
+    if (b == 'None') return 1;
+    return a.compareTo(b);
+  });
+
+  return forms;
+}
 
 //TeambuilderMenu widget. Generates the content on the page.
 class TeambuilderMenu extends StatefulWidget{
@@ -232,6 +255,12 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   List<Type> allTypes = [];
   final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
   List<String> pokemonNames = [];
+  List<String?> selectedForms = List.filled(6, null);
+  List<String?> selectedAbilities = List.filled(6, null);
+
+  List<List<String>> availableForms = List.generate(6, (_) => []);
+  List<List<String>> availableAbilities = List.generate(6, (_) => []);
+
   Map<String, Pokemon> pokemonMap = {};
   String getTypeAsset(String type) {
     return 'assets/type_logos/$type.png';
@@ -287,6 +316,39 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     setState(() {
       allTypes = data;
     });
+  }
+
+  Future<void> loadPokemonData(int index, String name) async {
+    final forms = await getForms(name);
+    final pokemon = await getPokemon(name);
+
+    print("---- DEBUG START ----");
+    print("Input name: $name");
+    print("Forms fetched: $forms");
+    print("Forms length: ${forms.length}");
+    print("Pokemon fetched: $pokemon");
+
+    setState(() {
+      availableForms[index] = forms;
+
+      if (pokemon != null) {
+        availableAbilities[index] = [
+          pokemon.ability1,
+          if (pokemon.ability2 != 'None') pokemon.ability2,
+          if (pokemon.abilityH != 'None') pokemon.abilityH
+        ];
+      } else {
+        availableAbilities[index] = [];
+      }
+
+      selectedForms[index] = forms.isNotEmpty ? forms.first: null;
+
+      selectedAbilities[index] = availableAbilities[index].isNotEmpty ? availableAbilities[index].first: null;
+    });
+
+    print("availableForms[$index]: ${availableForms[index]}");
+    print("availableAbilities[$index]: ${availableAbilities[index]}");
+    print("---- DEBUG END ----");
   }
 
   Widget teamBanner() {
@@ -419,14 +481,61 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
           children: [
             Wrap(
               spacing: 10,
+              runSpacing: 10,
               children: List.generate(6, (index) {
                 return SizedBox(
-                  width: 120,
-                  child: TextField(
-                    controller: controllers[index],
-                    decoration: InputDecoration(
-                      labelText: 'Pokemon ${index + 1}',
-                    ),
+                  width: 140,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: controllers[index],
+                        decoration: InputDecoration(
+                          labelText: 'Pokemon ${index + 1}',
+                        ),
+                        onChanged: (value) {
+                          print("TEXT FIELD TRIGGERED");
+                          loadPokemonData(index, value);
+                        },
+                      ),
+
+                      const SizedBox(height: 6),
+                      if (availableForms[index].length > 1) 
+                        DropdownButton<String> (
+                          isExpanded: true,
+                          value: selectedForms[index] ?? availableForms[index].first,
+                          hint: const Text("Form"),
+                          items: availableForms[index].map((form) {
+                            return DropdownMenuItem(
+                              value: form,
+                              child: Text(form),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedForms[index] = value;
+                            });
+                          },
+                        ),
+
+                      if (availableAbilities[index].isNotEmpty) 
+                        DropdownButton<String> (
+                          isExpanded: true,
+                          value: selectedAbilities[index] ?? availableAbilities[index].first,
+                          hint: const Text("Ability"),
+                          items: availableAbilities[index].map((ability) {
+                            return DropdownMenuItem(
+                              value: ability,
+                              child: Text(ability),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedAbilities[index] = value;
+                            });
+                          }
+                        ),
+                    ]
                   ),
                 );
               }),
