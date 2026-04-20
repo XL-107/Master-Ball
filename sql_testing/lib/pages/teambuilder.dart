@@ -199,6 +199,8 @@ double getDefMatchup(String primary, String secondary, String? ability, String o
 }
 //Takes the Pokemon's name and form (if specified) and returns the Pokemon class version that has all of its information
 Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
+  print("QUERY NAME: $pokemonName");
+  print("QUERY NAME: $form");
   final pokemonDb = await initDatabasePokemon();
   final abilityDb = await initDatabaseAbilities();
 
@@ -216,6 +218,7 @@ Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
     limit: 1,
   );
 
+  print("RESULT: $pokemonResult");
   if (pokemonResult.isEmpty) {
     return null;
   }
@@ -301,15 +304,19 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
       String formified = showdownFormatting(formParts[0]);
       if (formified == 'alolan') {
         formified = 'alola';
-      }else if (formified == 'galarian') {
+      } else if (formified == 'galarian') {
         formified = 'galar';
       } else if (formified == 'hisuian') {
         formified = 'hisui';
       } else if (formified == 'paldean') {
         formified = 'paldea';
+      } else if (formified == 'female') {
+        formified = 'f';
       }
+      print("CURRENT SPRITE FORM FOR $pokemonName: $formified");
       return 'https://play.pokemonshowdown.com/sprites/gen5/${showdownFormatting(pokemonName)}-$formified.png';
     } else {
+      print("CURRENT SPRITE FORM FOR $pokemonName: $form");
       return getDefaultPokemonSprite(pokemonName);
     }
   }
@@ -325,8 +332,10 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     return 'https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/$dex/Normal.png';*/
     if (form != null && form != 'None') {
       String formified = form.replaceAll(RegExp(r'[ -]'), '_');
+      print("CURRENT IMAGE FORM FOR $dexNum: $formified");
       return 'assets/icons/icon_${dexNum}_$formified.png';
     }else {
+      print("CURRENT IMAGE FORM FOR $dexNum: $form");
       return 'assets/icons/icon_$dexNum.png';
     }
   }
@@ -339,8 +348,15 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     }).toList();
   }
   Future<void> loadPokemon() async {
-    for (var name in pokemonNames) {
-      final p = await getPokemon(name);
+    for (int i = 0; i < pokemonNames.length; i++) {
+      final name = pokemonNames[i];
+      final form = selectedForms[i];
+      
+      final p = await getPokemon(
+        name,
+        form: form == 'None' ? null: form,
+      );
+
       if (p != null) {
         pokemonMap[name] = p;
       }
@@ -447,9 +463,17 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
 
                     return Image.network(
                       getPokemonSprite(pokemon.name, form),
-                      width: 120, // slightly bigger for depth
+                      width: 120,
                       height: 120,
                       fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.network(
+                          getDefaultPokemonSprite(pokemon.name),
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.contain,
+                        );
+                      },
                     );
                   }).toList(),
                 ),
@@ -708,6 +732,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                               ...pokemonNames.map((name) {
                                 final pokemon = pokemonMap[name];
                                 final form = selectedForms[pokemonNames.indexOf(name)];
+                                print("LOOKUP KEY: $name");
+                                print("MAP KEYS: ${pokemonMap.keys}");
                                 return DataColumn(
                                   label:
                                   SizedBox(
