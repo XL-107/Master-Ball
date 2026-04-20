@@ -16,17 +16,11 @@ Future<Database> initDatabaseType() async {
   // Check if DB already exists
   final exists = await databaseExists(path);
 
-  if (exists) {
-    await deleteDatabase(path);
+  if (!exists) {
+    final data = await rootBundle.load('assets/type_chart.db');
+    final bytes = data.buffer.asUint8List();
+    await File(path).writeAsBytes(bytes, flush: true);
   }
-
-  print("Copying database from assets...");
-
-  ByteData data = await rootBundle.load('assets/type_chart.db');
-  List<int> bytes =
-      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-
-  await File(path).writeAsBytes(bytes, flush: true);
 
   return openDatabase(path);
 }
@@ -37,17 +31,26 @@ Future<Database> initDatabasePokemon() async{
   // Check if DB already exists
   final exists = await databaseExists(path);
 
-  if (exists) {
-    await deleteDatabase(path);
+  if (!exists) {
+    final data = await rootBundle.load('assets/expanded_pokemon_test.db');
+    final bytes = data.buffer.asUint8List();
+    await File(path).writeAsBytes(bytes, flush: true);
   }
 
-  print("Copying database from assets...");
+  return openDatabase(path);
+}
+Future<Database> initDatabaseAbilities() async{
+  final dbPath = await getDatabasesPath();
+  final path = join(dbPath, 'pokemon_abilities.db');
 
-  ByteData data = await rootBundle.load('assets/expanded_pokemon_test.db');
-  List<int> bytes =
-      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  // Check if DB already exists
+  final exists = await databaseExists(path);
 
-  await File(path).writeAsBytes(bytes, flush: true);
+  if (!exists) {
+    final data = await rootBundle.load('assets/pokemon_abilities.db');
+    final bytes = data.buffer.asUint8List();
+    await File(path).writeAsBytes(bytes, flush: true);
+  }
 
   return openDatabase(path);
 }
@@ -114,24 +117,36 @@ class Type{
     );
   }
 }
-//Class that represents a Pokemon's individual data from the 
+//Class that represents a Pokemon's individual data from the pokemon abilities database. 
 class Pokemon {
   final int id;
   final String name;
+  final String? form;
   final String type1;
   final String type2;
+  final String ability1;
+  final String ability2;
+  final String abilityH;
   Pokemon({
     required this.id, 
-    required this.name, 
+    required this.name,
+    required this.form,
     required this.type1, 
-    required this.type2
+    required this.type2,
+    required this.ability1,
+    required this.ability2,
+    required this.abilityH
   });
   factory Pokemon.fromMap(Map<String, dynamic> map){
     return Pokemon(
       id: map['Number'],
       name: map['Name'],
+      form: map['Form'] ?? 'None',
       type1: map['Type1'],
       type2: map['Type2'] ?? 'None',
+      ability1: map['Ability1'] ?? 'None',
+      ability2: map['Ability2'] ?? 'None',
+      abilityH: map['Hidden'] ?? 'None',
     );
   }
 }
@@ -156,23 +171,58 @@ double getDefMatchup(String primary, String secondary, String offense, List<Type
   return multiplier;
 }
 //Helper function that gets a Pokemon's typing
-Future<Pokemon?> getPokemon(String pokemonName) async {
-  final db = await initDatabasePokemon();
-  final List<Map<String, dynamic>> result = await db.query(
+Future<Pokemon?> getPokemon(String pokemonName, {String? form}) async {
+  final pokemonDb = await initDatabasePokemon();
+  final abilityDb = await initDatabaseAbilities();
+
+  // normalize form
+  final normalizedForm = (form == null || form == '') ? null : form;
+
+  // 🔹 1. Fetch base Pokémon (types, etc.)
+  final pokemonResult = await pokemonDb.query(
     'expanded_pokemon_test',
-    columns: ['Number', 'Name', 'Type1', 'Type2'],
-    where: 'Name = ?',
-    whereArgs: [pokemonName],
+    where: normalizedForm == null
+        ? 'Name = ? AND (Form IS NULL OR Form = ?)'
+        : 'Name = ? AND Form = ?',
+    whereArgs: normalizedForm == null
+        ? [pokemonName]
+        : [pokemonName, normalizedForm],
     limit: 1,
   );
 
-  if (result.isNotEmpty) {
-    return Pokemon.fromMap(result.first);
-  } else {
-    print("Pokemon not found");
+  if (pokemonResult.isEmpty) {
     return null;
   }
+
+  final base = pokemonResult.first;
+
+  // 🔹 2. Fetch abilities
+  final abilityResult = await abilityDb.query(
+    'pokemon_abilities',
+    where: normalizedForm == null
+        ? 'Name = ? AND (Form IS NULL OR Form = ?)'
+        : 'Name = ? AND Form = ?',
+    whereArgs: normalizedForm == null
+        ? [pokemonName]
+        : [pokemonName, normalizedForm],
+    limit: 1,
+  );
+
+  final abilityRow = abilityResult.isNotEmpty ? abilityResult.first : null;
+
+  // 🔹 3. Combine into ONE Pokemon object
+  return Pokemon(
+    id: base['Number'] as int,
+    name: base['Name'] as String,
+    form: (base['Form'] ?? 'None') as String,
+    type1: base['Type1'] as String,
+    type2: (base['Type2'] ?? 'None') as String,
+    ability1: (abilityRow?['Ability1'] ?? 'None') as String,
+    ability2: (abilityRow?['Ability2'] ?? 'None') as String,
+    abilityH: (abilityRow?['Hidden'] ?? 'None') as String,
+  );
 }
+
 //TeambuilderMenu widget. Generates the content on the page.
 class TeambuilderMenu extends StatefulWidget{
   @override
@@ -240,34 +290,75 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   }
 
   Widget teamBanner() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 30),
-      decoration: BoxDecoration(
-        color: Color(0xFF311432),
-        border: Border.all(color: Color(0xFFF81894), width: 3),
-      ),
-      child: Column(
-        children: [
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            runSpacing: 12,
-            children: pokemonNames.map((name) {
-              final pokemon = pokemonMap[name];
+    final topRow = pokemonNames.take(3).toList();
+    final bottomRow = pokemonNames.skip(3).take(3).toList();
 
-              if (pokemon == null) {
-                return SizedBox(width: 100, height: 100);
-              }
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF311432),
+          border: Border.all(color: const Color(0xFFF81894), width: 2),
+        ),
+        child: SizedBox(
+          width: 480,
+          height: 240,
+          child: Stack(
+            children: [
+              Positioned(
+                top: 30,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 170,
+                  color: Color(0xFFB200ED),
+                )
+              ),
+              Positioned(
+                top: 20,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: topRow.map((name) {
+                    final pokemon = pokemonMap[name];
+                    if (pokemon == null) {
+                      return const SizedBox(width: 80, height: 80);
+                    }
 
-              return Image.network(
-                getPokemonSprite(pokemon.name),
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
-              );
-            }).toList(),
+                    return Image.network(
+                      getPokemonSprite(pokemon.name),
+                      width: 120, // slightly bigger for depth
+                      height: 120,
+                      fit: BoxFit.contain,
+                    );
+                  }).toList(),
+                ),
+              ),
+              Positioned(
+                top: 100,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: bottomRow.map((name) {
+                    final pokemon = pokemonMap[name];
+                    if (pokemon == null) {
+                      return const SizedBox(width: 80, height: 80);
+                    }
+
+                    return Image.network(
+                      getPokemonSprite(pokemon.name),
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
