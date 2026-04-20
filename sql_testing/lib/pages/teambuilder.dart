@@ -292,10 +292,28 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   String getTypeAsset(String type) {
     return 'assets/type_logos/$type.png';
   }
-  String getPokemonSprite(String pokemonName){
+  String getDefaultPokemonSprite(String pokemonName) {
     return 'https://play.pokemonshowdown.com/sprites/gen5/${showdownFormatting(pokemonName)}.png';
   }
-  String getPokemonImage(int dexNum) {
+  String getPokemonSprite(String pokemonName, String? form){
+    if (form != null && form != 'None') {
+      List<String> formParts = form.split(' ');
+      String formified = showdownFormatting(formParts[0]);
+      if (formified == 'alolan') {
+        formified = 'alola';
+      }else if (formified == 'galarian') {
+        formified = 'galar';
+      } else if (formified == 'hisuian') {
+        formified = 'hisui';
+      } else if (formified == 'paldean') {
+        formified = 'paldea';
+      }
+      return 'https://play.pokemonshowdown.com/sprites/gen5/${showdownFormatting(pokemonName)}-$formified.png';
+    } else {
+      return getDefaultPokemonSprite(pokemonName);
+    }
+  }
+  String getPokemonImage(int dexNum, String? form) {
     /*String dex = dexNum.toString();
     if (dexNum < 10) {
       dex = '000$dex';
@@ -305,7 +323,12 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
       dex = '0$dex';
     }
     return 'https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/$dex/Normal.png';*/
-    return 'assets/icons/icon_$dexNum.png';
+    if (form != null && form != 'None') {
+      String formified = form.replaceAll(RegExp(r'[ -]'), '_');
+      return 'assets/icons/icon_${dexNum}_$formified.png';
+    }else {
+      return 'assets/icons/icon_$dexNum.png';
+    }
   }
   String showdownFormatting(String pokemon) {
     return pokemon.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
@@ -417,12 +440,13 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: topRow.map((name) {
                     final pokemon = pokemonMap[name];
+                    final form = selectedForms[pokemonNames.indexOf(name)];
                     if (pokemon == null) {
                       return const SizedBox(width: 80, height: 80);
                     }
 
                     return Image.network(
-                      getPokemonSprite(pokemon.name),
+                      getPokemonSprite(pokemon.name, form),
                       width: 120, // slightly bigger for depth
                       height: 120,
                       fit: BoxFit.contain,
@@ -438,12 +462,13 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: bottomRow.map((name) {
                     final pokemon = pokemonMap[name];
+                    final form = selectedForms[pokemonNames.indexOf(name)];
                     if (pokemon == null) {
                       return const SizedBox(width: 80, height: 80);
                     }
 
                     return Image.network(
-                      getPokemonSprite(pokemon.name),
+                      getPokemonSprite(pokemon.name, form),
                       width: 120,
                       height: 120,
                       fit: BoxFit.contain,
@@ -682,6 +707,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                             columns: [
                               ...pokemonNames.map((name) {
                                 final pokemon = pokemonMap[name];
+                                final form = selectedForms[pokemonNames.indexOf(name)];
                                 return DataColumn(
                                   label:
                                   SizedBox(
@@ -689,7 +715,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
                                     height: 32,
                                     child: Center(
                                       child: pokemon != null ? Image.asset(
-                                        getPokemonImage(pokemon.id),
+                                        getPokemonImage(pokemon.id, form),
                                         width: 32,
                                         height: 32,
                                       )
