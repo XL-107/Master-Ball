@@ -1,3 +1,5 @@
+import 'pokemon_detail_page.dart';
+
 import 'package:flutter/material.dart';
 import 'data/pokemon_repository.dart';
 
@@ -27,6 +29,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   final repo = PokemonRepository();
   List<Map<String, dynamic>> pokemon = [];
   String selectedType = "All";
+  String selectedSort = "None";
 
   @override
   void initState() {
@@ -62,6 +65,20 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
+  Future<void> sortPokemon(String sortType) async {
+    if (sortType == "Total") {
+      final results = await repo.sortByTotal();
+      setState(() {
+        pokemon = results;
+      });
+    } else {
+      final results = await repo.searchByName("");
+      setState(() {
+        pokemon = results;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +93,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) async {
+                selectedSort = "None";
                 await searchPokemon(value);
               },
             ),
@@ -102,9 +120,31 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
               setState(() {
                 selectedType = value;
+                selectedSort = "None";
               });
 
               await filterPokemonByType(value);
+            },
+          ),
+          DropdownButton<String>(
+            value: selectedSort,
+            items: [
+              "None",
+              "Total",
+            ].map((sort) {
+              return DropdownMenuItem<String>(
+                value: sort,
+                child: Text("Sort: $sort"),
+              );
+            }).toList(),
+            onChanged: (value) async {
+              if (value == null) return;
+
+              setState(() {
+                selectedSort = value;
+              });
+
+              await sortPokemon(value);
             },
           ),
           Expanded(
@@ -115,6 +155,14 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 return ListTile(
                   title: Text(p["Name"]),
                   subtitle: Text("#${p["Number"]}"),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PokemonDetailPage(pokemon: p),
+                      ),
+                    );
+                  },
                 );
               },
             ),
