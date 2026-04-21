@@ -53,10 +53,10 @@ INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP"
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (27,'Sandshrew','Alolan Sandshrew','Ice','Steel',50,75,90,10,35,40);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (28,'Sandslash',NULL,'Ground',NULL,75,100,110,45,55,65);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (28,'Sandslash','Alolan Sandslash','Ice','Steel',75,100,120,25,65,65);
-INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (29,'Nidoran♀',NULL,'Poison',NULL,55,47,52,40,40,41);
+INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (29,'Nidoran','Female','Poison',NULL,55,47,52,40,40,41);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (30,'Nidorina',NULL,'Poison',NULL,70,62,67,55,55,56);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (31,'Nidoqueen',NULL,'Poison','Ground',90,92,87,75,85,76);
-INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (32,'Nidoran♂',NULL,'Poison',NULL,46,57,40,40,40,50);
+INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (32,'Nidoran','Male','Poison',NULL,46,57,40,40,40,50);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (33,'Nidorino',NULL,'Poison',NULL,61,72,57,55,55,65);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (34,'Nidoking',NULL,'Poison','Ground',81,102,77,85,75,85);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (35,'Clefairy',NULL,'Fairy',NULL,70,45,48,60,65,35);
@@ -818,7 +818,7 @@ INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP"
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (666,'Vivillon',NULL,'Bug','Flying',80,52,50,90,50,89);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (667,'Litleo',NULL,'Fire','Normal',62,50,58,73,54,72);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (668,'Pyroar',NULL,'Fire','Normal',86,68,72,109,66,106);
-INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (669,'Flabébé',NULL,'Fairy',NULL,44,38,39,61,79,42);
+INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (669,'Flabebe',NULL,'Fairy',NULL,44,38,39,61,79,42);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (670,'Floette',NULL,'Fairy',NULL,54,45,47,75,98,52);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (671,'Florges',NULL,'Fairy',NULL,78,65,68,112,154,75);
 INSERT INTO "expanded_pokemon_test" ("Number","Name","Form","Type1","Type2","HP","Attack","Defense","SP.Attack","SP.Defense","Speed") VALUES (672,'Skiddo',NULL,'Grass',NULL,66,65,48,62,57,52);
