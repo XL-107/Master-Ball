@@ -48,10 +48,10 @@ INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","H
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (27,'Sandshrew','Alolan Sandshrew','Snow Cloak',NULL,'Slush Rush');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (28,'Sandslash',NULL,'Sand Veil',NULL,'Sand Rush');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (28,'Sandslash','Alolan Sandslash','Snow Cloak',NULL,'Slush Rush');
-INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (29,'Nidoran♀',NULL,'Poison Point','Rivalry','Hustle');
+INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (29,'Nidoran','Female','Poison Point','Rivalry','Hustle');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (30,'Nidorina',NULL,'Poison Point','Rivalry','Hustle');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (31,'Nidoqueen',NULL,'Poison Point','Rivalry','Sheer Force');
-INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (32,'Nidoran♂',NULL,'Poison Point','Rivalry','Hustle');
+INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (32,'Nidoran','Male','Poison Point','Rivalry','Hustle');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (33,'Nidorino',NULL,'Poison Point','Rivalry','Hustle');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (34,'Nidoking',NULL,'Poison Point','Rivalry','Sheer Force');
 INSERT INTO "pokemon_abilities" ("Number","Name","Form","Ability1","Ability2","Hidden") VALUES (35,'Clefairy',NULL,'Cute Charm','Magic Guard','Friend Guard');
