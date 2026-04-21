@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import '../dbaccess.dart';
 import 'database_helper.dart';
 
 class PokemonRepository {
@@ -7,8 +8,8 @@ class PokemonRepository {
 
     return await db.rawQuery(
       '''
-      SELECT EntryId, Number, Name, Form, Type1, Type2
-      FROM pokemon
+      SELECT Number, Name, Form, Type1, Type2
+      FROM expanded_pokemon_test
       WHERE Name LIKE ? || '%'
       ORDER BY Name
       LIMIT 50
@@ -22,8 +23,8 @@ class PokemonRepository {
 
     return await db.rawQuery(
       '''
-      SELECT EntryId, Number, Name, Form, Type1, Type2
-      FROM pokemon
+      SELECT Number, Name, Form, Type1, Type2
+      FROM expanded_pokemon_test
       WHERE Type1 = ? OR Type2 = ?
       ORDER BY Number
       LIMIT 50
@@ -37,7 +38,7 @@ class PokemonRepository {
 
     return await db.rawQuery(
       '''
-      SELECT EntryId, Number, Name, Form, Total
+      SELECT Number, Name, Form, Total
       FROM pokemon_with_total
       ORDER BY Total DESC
       LIMIT 50

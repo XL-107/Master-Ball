@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     // Copy DB from assets if it doesn't exist
     if (!await File(path).exists()) {
-      final data = await rootBundle.load("assets/db/MasterBall.db");
+      final data = await rootBundle.load("assets/MasterBall.db");
       final bytes = data.buffer.asUint8List();
       await File(path).writeAsBytes(bytes);
     }
