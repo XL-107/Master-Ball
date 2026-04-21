@@ -5,12 +5,12 @@ import 'detailedView.dart';
 import 'dbaccess.dart';
 
 void main() {
-  // Initialize Flutter binding before accessing image cache
+  //Initialize Flutter binding before accessing image cache
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Optimize image caching for performance
+  //Optimize image caching for performance
   imageCache.maximumSize = 100;
-  imageCache.maximumSizeBytes = 50 * 1024 * 1024; // 50 MB cache
+  imageCache.maximumSizeBytes = 50 * 1024 * 1024; //50 MB cache
   runApp(MainApp());
 }
 
@@ -25,6 +25,7 @@ class _MainAppState extends State<MainApp> {
   final _db = DatabaseAccess();
   Pokemon? currentPokemon;
   final int pokemonCount = 1025;
+  final ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -67,58 +68,73 @@ class _MainAppState extends State<MainApp> {
                 child: DetailedView(pokemonEntry: currentPokemon!),
               ),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
+              child: RawScrollbar(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(
+                    color: Colors.black,
+                    width: 2.0, 
+                  ),
                 ),
-                itemCount: pokemonCount,
-                itemBuilder: (context, index) {
-                final pokemonNumber = index + 1;
-                return GestureDetector(
-                  onTap: () async {
-                    final pokemon = await _db.getPokemonAtIndex(index);
-                    setState(() {
-                      if(currentPokemon != pokemon){
-                        currentPokemon = pokemon;
-                      }else{
-                        currentPokemon = null;
-                      }
-                    });
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 177, 67, 240),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          )
-                        ),
-                        child: FadeInImage.memoryNetwork(
-                          placeholder: kTransparentImage,
-                          image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonNumber}.png',
-                          fit: BoxFit.contain,
-                          filterQuality: FilterQuality.none,
-                          fadeInDuration: Duration(milliseconds: 300),
-                          fadeOutDuration: Duration(milliseconds: 100),
-                        ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: Text(
-                          pokemonNumber.toString().padLeft(4, '0'),
-                          style: TextStyle(
-                            fontFamily: 'PKMN RBYGSC',
-                            fontSize: 12,
+                thumbColor: Color.fromARGB(255, 88, 125, 248),
+                thumbVisibility: true,
+                interactive: true,
+                controller: _controller,
+                thickness: 15.0,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                  ),
+                  controller: _controller,
+                  itemCount: pokemonCount,
+                  itemBuilder: (context, index) {
+                  final pokemonNumber = index + 1;
+                  return GestureDetector(
+                    onTap: () async {
+                      final pokemon = await _db.getPokemonAtIndex(index);
+                      setState(() {
+                        if(currentPokemon != pokemon){
+                          currentPokemon = pokemon;
+                        }else{
+                          currentPokemon = null;
+                        }
+                      });
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 177, 67, 240),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1.0,
+                            )
+                          ),
+                          child: FadeInImage.memoryNetwork(
+                            placeholder: kTransparentImage,
+                            image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.none,
+                            fadeInDuration: Duration(milliseconds: 300),
+                            fadeOutDuration: Duration(milliseconds: 100),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: Text(
+                            pokemonNumber.toString().padLeft(4, '0'),
+                            style: TextStyle(
+                              fontFamily: 'PKMN RBYGSC',
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                ),
               ),
             ),
           ],
