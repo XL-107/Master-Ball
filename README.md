@@ -6,7 +6,7 @@ We plan for this pokemon app to have sorting, display, and also teambuilding cap
 We have code for a working teambuilder and pokedex, and a partially complete main menu, but they are not linked to each other. There is still no final product. 
 
 ## Running:
-Our code depends on an Android Studio medium phone emulator with additional packages. Follow the steps listed in [the offical flutter guide to android studio](https://docs.flutter.dev/tools/android-studio) to install and prepare the emulator. 
+Our code depends on an Android Studio medium phone emulator with additional packages. Follow the steps listed in [the official Flutter guide to Android Studio](https://docs.flutter.dev/platform-integration/android/setup) to install and prepare the emulator. 
 
 Flutter relies on a `pubspec.yaml` file to load packages, so the folder where the `flutter run` command is executed is important. 
 
