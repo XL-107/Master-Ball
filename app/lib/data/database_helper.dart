@@ -15,11 +15,11 @@ class DatabaseHelper {
 
   static Future<Database> _initDB() async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, "masterball.db");
+    final path = join(documentsDirectory.path, "masterballPhone.db");
 
     // Copy DB from assets if it doesn't exist
     if (!await File(path).exists()) {
-      final data = await rootBundle.load("assets/db/masterball.db");
+      final data = await rootBundle.load("assets/db/MasterBall.db");
       final bytes = data.buffer.asUint8List();
       await File(path).writeAsBytes(bytes);
     }
