@@ -2,7 +2,7 @@
 
 set -e
 
-DB_FILE="masterball.db"
+DB_FILE="masterballPhone.db"
 
 echo "Removing old database..."
 rm -f $DB_FILE
