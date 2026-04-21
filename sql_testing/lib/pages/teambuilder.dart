@@ -291,6 +291,8 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
   List<List<String>> availableForms = List.generate(6, (_) => []);
   List<List<String>> availableAbilities = List.generate(6, (_) => []);
 
+  bool isTeamBuilt = false;
+
   Map<String, Pokemon> pokemonMap = {};
   String getTypeAsset(String type) {
     return 'assets/type_logos/$type.png';
@@ -363,7 +365,7 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     }
     setState(() {});
   }
-  void updateTeam() async {
+  Future<void> updateTeam() async {
     pokemonNames = controllers
         .map((c) => c.text.trim())
         .where((name) => name.isNotEmpty)
@@ -507,9 +509,198 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-      Map<String, int> totalWeaks = {
+  Widget buildInputView() {
+    return Center (
+      child: Column (
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: List.generate(6, (index) {
+              return SizedBox(
+                width: 140,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //Pokemon name input
+                    TextField(
+                      controller: controllers[index],
+                      style: TextStyle(
+                        fontFamily: 'PKMN RBYGSC',
+                        color: Colors.white,
+                      ),
+                      decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          fontFamily: 'PKMN RBYGSC',
+                          color: Colors.white,
+                        ),
+                        labelText: 'Pokemon ${index + 1}',
+                      ),
+                      onChanged: (value) async {
+                        if (value.length <= 2) return;
+
+                        final name = value.trim();
+
+                        final forms = await getForms(name);
+                        final pokemon = await getPokemon(name);
+
+                        setState(() {
+                          // set forms
+                          availableForms[index] = forms;
+
+                          // default selected form
+                          selectedForms[index] =
+                              forms.isNotEmpty ? forms.first : null;
+
+                          // set abilities from base form
+                          if (pokemon != null) {
+                            availableAbilities[index] = [
+                              pokemon.ability1,
+                              if (pokemon.ability2 != 'None') pokemon.ability2,
+                              if (pokemon.abilityH != 'None') pokemon.abilityH,
+                            ];
+
+                            selectedAbilities[index] =
+                                availableAbilities[index].isNotEmpty
+                                    ? availableAbilities[index].first
+                                    : null;
+                          } else {
+                            availableAbilities[index] = [];
+                            selectedAbilities[index] = null;
+                          }
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    //Form dropdown
+                    if (availableForms[index].length > 1)
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        value: selectedForms[index] ?? availableForms[index].first,
+                        hint: const Text("Form"),
+                        items: availableForms[index].map((form) {
+                          return DropdownMenuItem(
+                            value: form,
+                            child: Text(
+                              style: TextStyle(
+                                fontFamily: 'PKMN RBYGSC',
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
+                              form),
+                          );
+                        }).toList(),
+                        onChanged: (value) async {
+                          setState(() {
+                            selectedForms[index] = value;
+                          });
+
+                          final pokemon = await getPokemon(
+                            controllers[index].text.trim(),
+                            form: value == 'None' ? null : value,
+                          );
+
+                          setState(() {
+                            if (pokemon != null) {
+                              availableAbilities[index] = [
+                                pokemon.ability1,
+                                if (pokemon.ability2 != 'None') pokemon.ability2,
+                                if (pokemon.abilityH != 'None') pokemon.abilityH,
+                              ];
+
+                              selectedAbilities[index] =
+                                  availableAbilities[index].isNotEmpty
+                                      ? availableAbilities[index].first
+                                      : null;
+                            } else {
+                              availableAbilities[index] = [];
+                              selectedAbilities[index] = null;
+                            }
+                          });
+                        },
+                      ),
+
+                    //Ability dropdown
+                    if (availableAbilities[index].isNotEmpty)
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        value: selectedAbilities[index] ??
+                            availableAbilities[index].first,
+                        hint: const Text(
+                          style: TextStyle(
+                            fontFamily: 'PKMN RBYGSC',
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                          "Ability"),
+                        items: availableAbilities[index].map((ability) {
+                          return DropdownMenuItem(
+                            value: ability,
+                            child: Text(
+                              style: TextStyle(
+                                fontFamily: 'PKMN RBYGSC',
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
+                              ability),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedAbilities[index] = value;
+                          });
+                        },
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ),
+
+          ElevatedButton(
+            onPressed: () async {
+              await updateTeam();
+              setState(() {
+                isTeamBuilt = true; 
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF6F2DA8),
+              foregroundColor: Colors.white,
+
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+                side: BorderSide(
+                  color: Colors.black,
+                  width: 2,
+                )
+              ),
+
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical : 12),
+            ), 
+            child: Text(
+              style: TextStyle(
+                fontFamily: 'PKMN RBYGSC',
+                color: Colors.white,
+              ),
+              'Build Team'),
+          ),
+        ]
+      ),
+    );
+  }
+
+  List<Widget> spaced(List<Widget> children, double space) {
+    return children.expand((widget) => [
+      widget,
+      SizedBox(height: space),
+    ]).toList()..removeLast();
+  }
+
+  Widget buildResultsView() {
+    Map<String, int> totalWeaks = {
       'Normal': 0,
       'Fire': 0,
       'Water': 0,
@@ -549,280 +740,235 @@ class TeambuilderMenuState extends State<TeambuilderMenu> {
       'Steel': 0,
       'Fairy': 0,
     };
+    return Column(children: spaced([
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            isTeamBuilt = false;
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Color(0xFF6F2DA8),
+          foregroundColor: Colors.white,
+
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+            side: BorderSide(
+              color: Colors.black,
+              width: 2,
+            )
+          ),
+
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical : 12),
+        ), 
+        child: Text(
+          style: TextStyle(
+            fontFamily: 'PKMN RBYGSC',
+            color: Colors.white,
+          ),
+          'Edit Team'),
+      ),
+      teamBanner(),
+      Expanded(
+        child: pokemonNames.isEmpty ? const Center(
+          child: Text(
+            "Enter a team",
+            style: TextStyle(fontSize: 18),
+          ),
+          )
+          : SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DataTable(
+                  border: TableBorder.all(
+                    width: 2.0,
+                    color: Colors.black,
+                  ),
+                  columns: const [
+                    DataColumn(label: Text(
+                      style: TextStyle(
+                        fontFamily: 'PKMN RBYGSC',
+                        color: Colors.white,
+                      ),
+                      'Type')
+                    ),
+                  ],
+                  rows: typeNames.map((type) {
+                    return DataRow(
+                      cells: [
+                        DataCell(Image.asset(
+                          getTypeAsset(type),
+                          width: 32,
+                          height: 32,
+                        )),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      border: TableBorder.all(
+                        width: 2.0,
+                        color: Colors.black,
+                      ),
+                      columns: [
+                        ...pokemonNames.map((name) {
+                          final pokemon = pokemonMap[name];
+                          final form = selectedForms[pokemonNames.indexOf(name)];
+                          print("LOOKUP KEY: $name");
+                          print("MAP KEYS: ${pokemonMap.keys}");
+                          return DataColumn(
+                            label:
+                            SizedBox(
+                              width: 32,
+                              height: 32,
+                              child: Center(
+                                child: pokemon != null ? Image.asset(
+                                  getPokemonImage(pokemon.id, form),
+                                  width: 32,
+                                  height: 32,
+                                )
+                                : const SizedBox(width: 32, height: 32),
+                              ),
+                            ) 
+                              // fallback UI
+                          );
+                        }),
+                        DataColumn(
+                          label: SizedBox(
+                            width: 100,
+                            height: 64,
+                            child:Center(child: Text(
+                              'Weaks', 
+                              style: TextStyle(
+                                fontFamily: 'PKMN RBYGSC',
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            )),
+                          )
+                        ),
+                        DataColumn(
+                          label: SizedBox(
+                            width: 100,
+                            height: 64,
+                            child:Center(child: Text(
+                              'Resists', 
+                              style: TextStyle(
+                                fontFamily: 'PKMN RBYGSC',
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            )),
+                          )
+                        ),
+                      ],
+
+                      rows: typeNames.map((type) {
+                        return DataRow(
+                          cells: [
+                            ...pokemonNames.map((name) {
+                              final pokemon = pokemonMap[name];
+                              if (pokemon == null) {
+                                return const DataCell(Text('N/A'));
+                              }
+                              final ability = selectedAbilities[pokemonNames.indexOf(name)];
+                              final matchup = getDefMatchup(pokemon.type1, pokemon.type2, ability, type, allTypes);
+                              if (matchup < 1.0) {
+                                totalResists[type] = (totalResists[type] ?? 0) + 1;
+                              }else if (matchup > 1.0){
+                                totalWeaks[type] = (totalWeaks[type] ?? 0) + 1;
+                              }
+                              return DataCell(
+                                SizedBox(
+                                  width: 32,
+                                  child:Center(child: Text(
+                                    matchup.toString(), 
+                                    style: TextStyle(
+                                      fontFamily: 'PKMN RBYGSC',
+                                      fontSize: 9,
+                                      color: Colors.white,
+                                    ),
+                                  )),
+                                )
+                              );
+                            }),
+                            DataCell(
+                              SizedBox(
+                                width: 64,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child:Center(child: Text(
+                                    totalWeaks[type].toString(), 
+                                    style: TextStyle(
+                                      fontFamily: 'PKMN RBYGSC',
+                                      color: Colors.white,
+                                    ),
+                                  )),
+                                )
+                              )
+                            ),
+                            DataCell(
+                              SizedBox(
+                                width: 64,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child:Center(child: Text(
+                                    totalResists[type].toString(), 
+                                    style: TextStyle(
+                                      fontFamily: 'PKMN RBYGSC',
+                                      color: Colors.white,
+                                    ),
+                                  )),
+                                )
+                              )
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ),
+    ], 12),);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       // MaterialApp with debugShowCheckedModeBanner false and home
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.purple,
+          brightness: Brightness.dark,
+        )
+      ),
       home: Scaffold(
         // Scaffold with appbar ans body.
         backgroundColor: Colors.purple,
         appBar: AppBar(
-          title: Text('Teambuilder'),
+          title: Text(
+            'Teambuilder',
+            style: TextStyle(
+              fontFamily: 'PKMN RBYGSC',
+              fontSize: 30,
+              color: Colors.white,
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.purple,
         ),
-        body: Column(
-          children: [
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(6, (index) {
-                return SizedBox(
-                  width: 140,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //Pokemon name input
-                      TextField(
-                        controller: controllers[index],
-                        decoration: InputDecoration(
-                          labelText: 'Pokemon ${index + 1}',
-                        ),
-                        onChanged: (value) async {
-                          if (value.length <= 2) return;
-
-                          final name = value.trim();
-
-                          final forms = await getForms(name);
-                          final pokemon = await getPokemon(name);
-
-                          setState(() {
-                            // set forms
-                            availableForms[index] = forms;
-
-                            // default selected form
-                            selectedForms[index] =
-                                forms.isNotEmpty ? forms.first : null;
-
-                            // set abilities from base form
-                            if (pokemon != null) {
-                              availableAbilities[index] = [
-                                pokemon.ability1,
-                                if (pokemon.ability2 != 'None') pokemon.ability2,
-                                if (pokemon.abilityH != 'None') pokemon.abilityH,
-                              ];
-
-                              selectedAbilities[index] =
-                                  availableAbilities[index].isNotEmpty
-                                      ? availableAbilities[index].first
-                                      : null;
-                            } else {
-                              availableAbilities[index] = [];
-                              selectedAbilities[index] = null;
-                            }
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      //Form dropdown
-                      if (availableForms[index].length > 1)
-                        DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedForms[index] ?? availableForms[index].first,
-                          hint: const Text("Form"),
-                          items: availableForms[index].map((form) {
-                            return DropdownMenuItem(
-                              value: form,
-                              child: Text(form),
-                            );
-                          }).toList(),
-                          onChanged: (value) async {
-                            setState(() {
-                              selectedForms[index] = value;
-                            });
-
-                            final pokemon = await getPokemon(
-                              controllers[index].text.trim(),
-                              form: value == 'None' ? null : value,
-                            );
-
-                            setState(() {
-                              if (pokemon != null) {
-                                availableAbilities[index] = [
-                                  pokemon.ability1,
-                                  if (pokemon.ability2 != 'None') pokemon.ability2,
-                                  if (pokemon.abilityH != 'None') pokemon.abilityH,
-                                ];
-
-                                selectedAbilities[index] =
-                                    availableAbilities[index].isNotEmpty
-                                        ? availableAbilities[index].first
-                                        : null;
-                              } else {
-                                availableAbilities[index] = [];
-                                selectedAbilities[index] = null;
-                              }
-                            });
-                          },
-                        ),
-
-                      //Ability dropdown
-                      if (availableAbilities[index].isNotEmpty)
-                        DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedAbilities[index] ??
-                              availableAbilities[index].first,
-                          hint: const Text("Ability"),
-                          items: availableAbilities[index].map((ability) {
-                            return DropdownMenuItem(
-                              value: ability,
-                              child: Text(ability),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedAbilities[index] = value;
-                            });
-                          },
-                        ),
-                    ],
-                  ),
-                );
-              }),
-            ),
-
-            ElevatedButton(
-              onPressed: () {
-                updateTeam();
-              },
-              child: Text('Build Team'),
-            ),
-            teamBanner(),
-            Expanded(
-              child: pokemonNames.isEmpty ? const Center(
-                child: Text(
-                  "Enter a team",
-                  style: TextStyle(fontSize: 18),
-                ),
-                )
-                : SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      DataTable(
-                        border: TableBorder.all(
-                          width: 1.0,
-                          color: Colors.black,
-                        ),
-                        columns: const [
-                          DataColumn(label: Text('Type')),
-                        ],
-                        rows: typeNames.map((type) {
-                          return DataRow(
-                            cells: [
-                              DataCell(Image.asset(
-                                getTypeAsset(type),
-                                width: 32,
-                                height: 32,
-                              )),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            border: TableBorder.all(
-                              width: 1.0,
-                              color: Colors.black,
-                            ),
-                            columns: [
-                              ...pokemonNames.map((name) {
-                                final pokemon = pokemonMap[name];
-                                final form = selectedForms[pokemonNames.indexOf(name)];
-                                print("LOOKUP KEY: $name");
-                                print("MAP KEYS: ${pokemonMap.keys}");
-                                return DataColumn(
-                                  label:
-                                  SizedBox(
-                                    width: 32,
-                                    height: 32,
-                                    child: Center(
-                                      child: pokemon != null ? Image.asset(
-                                        getPokemonImage(pokemon.id, form),
-                                        width: 32,
-                                        height: 32,
-                                      )
-                                      : const SizedBox(width: 32, height: 32),
-                                    ),
-                                  ) 
-                                   // fallback UI
-                                );
-                              }),
-                              DataColumn(
-                                label: SizedBox(
-                                  width: 100,
-                                  height: 64,
-                                  child:Center(child: Text('Total Weaks', style: TextStyle(fontSize: 14))),
-                                )
-                              ),
-                              DataColumn(
-                                label: SizedBox(
-                                  width: 100,
-                                  height: 64,
-                                  child:Center(child: Text('Total Resists', style: TextStyle(fontSize: 14))),
-                                )
-                              ),
-                            ],
-
-                            rows: typeNames.map((type) {
-                              return DataRow(
-                                cells: [
-                                  ...pokemonNames.map((name) {
-                                    final pokemon = pokemonMap[name];
-                                    if (pokemon == null) {
-                                      return const DataCell(Text('N/A'));
-                                    }
-                                    final ability = selectedAbilities[pokemonNames.indexOf(name)];
-                                    final matchup = getDefMatchup(pokemon.type1, pokemon.type2, ability, type, allTypes);
-                                    if (matchup < 1.0) {
-                                      totalResists[type] = (totalResists[type] ?? 0) + 1;
-                                    }else if (matchup > 1.0){
-                                      totalWeaks[type] = (totalWeaks[type] ?? 0) + 1;
-                                    }
-                                    return DataCell(
-                                      SizedBox(
-                                        width: 32,
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(matchup.toString()),
-                                        )
-                                      )
-                                    );
-                                  }),
-                                  DataCell(
-                                    SizedBox(
-                                      width: 64,
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(totalWeaks[type].toString()),
-                                      )
-                                    )
-                                  ),
-                                  DataCell(
-                                    SizedBox(
-                                      width: 64,
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(totalResists[type].toString()),
-                                      )
-                                    )
-                                  ),
-                                ],
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ),
-          ],
-        ),
-      )
+        body: isTeamBuilt ? buildResultsView() : buildInputView(),
+      ),
     );
   }
 }
