@@ -32,3 +32,6 @@ The database file in the assets folder is separate from the stored assets in the
 - Main Menu PokeDEX icon: https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9dex#/media/File:Gen_I_Pok%C3%A9dex.png
 - Main Menu Pokeball icon: https://commons.wikimedia.org/wiki/File:Pokebola-pokeball-png-0.png
 - Main Menu Calculator icon: https://favpng.com/png_search/calculator-designs/4
+
+## Audio sources
+- Main Menu Background Music: https://www.youtube.com/watch?v=biLeC5D4S48&list=PLUhiGIcAg0FSKxCEkaX1g-A6F9u8-8hbi&index=10
