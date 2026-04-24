@@ -5,16 +5,21 @@ import 'pokemon.dart';
 class DetailedView extends StatelessWidget {
 
   final Pokemon pokemonEntry;
+  // final bool expanded;
 
   const DetailedView({
     super.key,
     required this.pokemonEntry,
+    // required this.expanded,
   });
 
   @override
   Widget build(BuildContext context){
     return Row(
       children: [
+        // if(expanded)
+
+        // if(!expanded)
         SizedBox(
           height: 300,
           child: Column(

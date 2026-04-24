@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grabber_sheet/grabber_sheet.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'pokemon.dart';
 import 'detailedView.dart';
@@ -24,8 +25,9 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   final _db = DatabaseAccess();
   Pokemon? currentPokemon;
+  // late bool expanded = false;
   final int pokemonCount = 1025;
-  final ScrollController _controller = ScrollController();
+  // final ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,73 +70,88 @@ class _MainAppState extends State<MainApp> {
                 child: DetailedView(pokemonEntry: currentPokemon!),
               ),
             Expanded(
-              child: RawScrollbar(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(
-                    color: Colors.black,
-                    width: 2.0, 
-                  ),
+              child: GrabberSheet(
+                snap: true,
+                initialChildSize: 1.0,
+                minChildSize: 0.25,
+                maxChildSize: 1.0,
+                backgroundColor: Colors.black,
+                borderRadius: BorderRadius.zero,
+                snapSizes: [0.25, 0.5, 1.0],
+                grabberStyle: GrabberStyle(
+                  color: Colors.white,
+                  radius: Radius.zero
                 ),
-                thumbColor: Color.fromARGB(255, 88, 125, 248),
-                thumbVisibility: true,
-                interactive: true,
-                controller: _controller,
-                thickness: 15.0,
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                  ),
-                  controller: _controller,
-                  itemCount: pokemonCount,
-                  itemBuilder: (context, index) {
-                  final pokemonNumber = index + 1;
-                  return GestureDetector(
-                    onTap: () async {
-                      final pokemon = await _db.getPokemonAtIndex(index);
-                      setState(() {
-                        if(currentPokemon != pokemon){
-                          currentPokemon = pokemon;
-                        }else{
-                          currentPokemon = null;
-                        }
-                      });
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 177, 67, 240),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 1.0,
-                            )
+                builder: (context, scrollController) {
+                  return RawScrollbar(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(
+                        color: Colors.black,
+                        width: 2.0, 
+                      ),
+                    ),
+                    thumbColor: Color.fromARGB(255, 88, 125, 248),
+                    thumbVisibility: true,
+                    interactive: true,
+                    controller: scrollController,
+                    thickness: 15.0,
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 5,
+                      ),
+                      controller: scrollController,
+                      itemCount: pokemonCount,
+                      itemBuilder: (context, index) {
+                        final pokemonNumber = index + 1;
+                        return GestureDetector(
+                          onTap: () async {
+                            final pokemon = await _db.getPokemonAtIndex(index);
+                            setState(() {
+                              if(currentPokemon != pokemon){
+                                currentPokemon = pokemon;
+                              }else{
+                                currentPokemon = null;
+                              }
+                            });
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color.fromARGB(255, 177, 67, 240),
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  )
+                                ),
+                                child: FadeInImage.memoryNetwork(
+                                  placeholder: kTransparentImage,
+                                  image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
+                                  fit: BoxFit.contain,
+                                  filterQuality: FilterQuality.none,
+                                  fadeInDuration: Duration(milliseconds: 300),
+                                  fadeOutDuration: Duration(milliseconds: 100),
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: Text(
+                                  pokemonNumber.toString().padLeft(4, '0'),
+                                  style: TextStyle(
+                                    fontFamily: 'PKMN RBYGSC',
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: FadeInImage.memoryNetwork(
-                            placeholder: kTransparentImage,
-                            image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.none,
-                            fadeInDuration: Duration(milliseconds: 300),
-                            fadeOutDuration: Duration(milliseconds: 100),
-                          ),
-                        ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Text(
-                            pokemonNumber.toString().padLeft(4, '0'),
-                            style: TextStyle(
-                              fontFamily: 'PKMN RBYGSC',
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   );
                 },
-                ),
               ),
             ),
           ],
