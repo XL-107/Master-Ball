@@ -27,7 +27,10 @@ class _MainAppState extends State<MainApp> {
   Pokemon? currentPokemon;
   // late bool expanded = false;
   final int pokemonCount = 1025;
-  // final ScrollController _controller = ScrollController();
+  // double min = 1.0;
+  // double mid = 1.0;
+  // List<double>? sizes = null;
+  final ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +63,7 @@ class _MainAppState extends State<MainApp> {
           centerTitle: true,
           backgroundColor: Color.fromARGB(255, 110, 8, 185),
         ),
-        body: Column(
+        body: Stack(
           children: [
             if (currentPokemon != null)
               Container(
@@ -69,8 +72,100 @@ class _MainAppState extends State<MainApp> {
                 ),
                 child: DetailedView(pokemonEntry: currentPokemon!),
               ),
-            Expanded(
-              child: GrabberSheet(
+            // Expanded(
+            //   child: 
+              if(currentPokemon == null)
+              Column(
+                children: [
+                  Container(
+                    color: Colors.black,
+                    width: double.infinity,
+                    height: 30,
+                    child: Center(
+                      child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ),
+                  ),
+                  Expanded(
+                    child: RawScrollbar(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: Colors.black,
+                          width: 2.0, 
+                        ),
+                      ),
+                      thumbColor: Color.fromARGB(255, 88, 125, 248),
+                      thumbVisibility: true,
+                      interactive: true,
+                      controller: _controller,
+                      thickness: 15.0,
+                      child: GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                        ),
+                        controller: _controller,
+                        itemCount: pokemonCount,
+                        itemBuilder: (context, index) {
+                          final pokemonNumber = index + 1;
+                          return GestureDetector(
+                            onTap: () async {
+                              final pokemon = await _db.getPokemonAtIndex(index);
+                              setState(() {
+                                if(currentPokemon != pokemon){
+                                  currentPokemon = pokemon;
+                                }else{
+                                  currentPokemon = null;
+                                }
+                              });
+                            },
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(255, 177, 67, 240),
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 1.0,
+                                    )
+                                  ),
+                                  child: FadeInImage.memoryNetwork(
+                                    placeholder: kTransparentImage,
+                                    image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
+                                    fit: BoxFit.contain,
+                                    filterQuality: FilterQuality.none,
+                                    fadeInDuration: Duration(milliseconds: 300),
+                                    fadeOutDuration: Duration(milliseconds: 100),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: Text(
+                                    pokemonNumber.toString().padLeft(4, '0'),
+                                    style: TextStyle(
+                                      fontFamily: 'PKMN RBYGSC',
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if(currentPokemon != null)
+              GrabberSheet(
                 snap: true,
                 initialChildSize: 1.0,
                 minChildSize: 0.25,
@@ -79,8 +174,11 @@ class _MainAppState extends State<MainApp> {
                 borderRadius: BorderRadius.zero,
                 snapSizes: [0.25, 0.5, 1.0],
                 grabberStyle: GrabberStyle(
+                  width: 20,
+                  height: 20,
                   color: Colors.white,
-                  radius: Radius.zero
+                  radius: Radius.circular(10),
+                  margin: EdgeInsetsGeometry.all(5)
                 ),
                 builder: (context, scrollController) {
                   return RawScrollbar(
@@ -153,7 +251,7 @@ class _MainAppState extends State<MainApp> {
                   );
                 },
               ),
-            ),
+            // ),
           ],
         ),
       ),
