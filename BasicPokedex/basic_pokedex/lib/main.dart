@@ -25,11 +25,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   final _db = DatabaseAccess();
   Pokemon? currentPokemon;
-  // late bool expanded = false;
   final int pokemonCount = 1025;
-  // double min = 1.0;
-  // double mid = 1.0;
-  // List<double>? sizes = null;
   final ScrollController _controller = ScrollController();
 
   @override
@@ -72,9 +68,7 @@ class _MainAppState extends State<MainApp> {
                 ),
                 child: DetailedView(pokemonEntry: currentPokemon!),
               ),
-            // Expanded(
-            //   child: 
-              if(currentPokemon == null)
+            if(currentPokemon == null) //when Currentpokemon is null uses containers to replicate grabbersheet look, but you can't drag grid down
               Column(
                 children: [
                   Container(
@@ -164,15 +158,15 @@ class _MainAppState extends State<MainApp> {
                   ),
                 ],
               ),
-              if(currentPokemon != null)
-              GrabberSheet(
+            if(currentPokemon != null)
+              GrabberSheet( //makes gridView draggable to different heights in the screen (causes some annoying issues when on start or end of gridview)
                 snap: true,
-                initialChildSize: 1.0,
+                initialChildSize: 0.65,
                 minChildSize: 0.25,
                 maxChildSize: 1.0,
                 backgroundColor: Colors.black,
                 borderRadius: BorderRadius.zero,
-                snapSizes: [0.25, 0.5, 1.0],
+                snapSizes: [0.25, 0.65, 1.0],
                 grabberStyle: GrabberStyle(
                   width: 20,
                   height: 20,
@@ -210,6 +204,7 @@ class _MainAppState extends State<MainApp> {
                                 currentPokemon = pokemon;
                               }else{
                                 currentPokemon = null;
+                                
                               }
                             });
                           },
@@ -251,7 +246,6 @@ class _MainAppState extends State<MainApp> {
                   );
                 },
               ),
-            // ),
           ],
         ),
       ),

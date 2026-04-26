@@ -37,6 +37,36 @@ class Pokemon {
       _ => 'unknown',
     };
   }
+
+  Map<String, int> getStatsWithNames(){
+    int total = 0;
+    baseStats.forEach((stat) {
+      total += stat;
+    });
+    
+    return {
+      "HP": baseStats[0],
+      "Attack": baseStats[1],
+      "Defense": baseStats[2],
+      "Sp. Atk": baseStats[3],
+      "Sp. Def": baseStats[4],
+      "Speed": baseStats[5],
+      "Total": total
+    };
+  }
+
+  List<String> getAbilitiesFormatted(){
+    List<String> abilitiesFormatted = [];
+
+    for(int i = 0; i < abilities.length; ++i){
+      if(abilities[i] == abilities.last){
+        abilitiesFormatted.add('${abilities[i]} (hidden ability)');
+      }else if(abilities[i] != 'None'){
+        abilitiesFormatted.add(abilities[i]); 
+      }
+    }
+    return abilitiesFormatted;
+  }
 }
 
 class Move {
