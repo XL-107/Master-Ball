@@ -25,7 +25,7 @@ class SearchBarApp extends StatefulWidget {
     List<MapEntry<int, PokemonListItem>> nameSuggestions = [];
     for(int i = 0; i < dex.length; ++i){ //returns all pokemon starting with first letter of input and containing input
       if(dex[i].getNameWithForm()[0].toLowerCase() == input[0] && dex[i].getNameWithForm().toLowerCase().contains(input)){
-        nameSuggestions.add(MapEntry(i, dex[i]));
+        nameSuggestions.add(MapEntry(dex[i].number -1, dex[i]));
       }
     }
     return nameSuggestions;
