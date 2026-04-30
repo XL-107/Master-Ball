@@ -3,7 +3,7 @@ import 'pokemon.dart';
 
 class SearchBarApp extends StatefulWidget {
   final SearchController controller;
-  final List<Pokemon> pokemonList;
+  final List<PokemonListItem> pokemonList;
   final ValueChanged<int> onPokemonSelected;
 
   const SearchBarApp({
@@ -14,7 +14,7 @@ class SearchBarApp extends StatefulWidget {
   });
 
   //returns a list of suggestions for search anchor suggestions builder based of search input
-  List<MapEntry<int, Pokemon>> suggestPokemon(String input, List<Pokemon> dex){ 
+  List<MapEntry<int, PokemonListItem>> suggestPokemon(String input, List<PokemonListItem> dex){ 
     if(input.isEmpty){ //checks if there is input
       return [];
     }
@@ -22,7 +22,7 @@ class SearchBarApp extends StatefulWidget {
     if(id != null && id <= dex.length && id > 0){
       return [MapEntry(id - 1, dex[id - 1])];
     }
-    List<MapEntry<int, Pokemon>> nameSuggestions = [];
+    List<MapEntry<int, PokemonListItem>> nameSuggestions = [];
     for(int i = 0; i < dex.length; ++i){ //returns all pokemon starting with first letter of input and containing input
       if(dex[i].getNameWithForm()[0].toLowerCase() == input[0] && dex[i].getNameWithForm().toLowerCase().contains(input)){
         nameSuggestions.add(MapEntry(i, dex[i]));

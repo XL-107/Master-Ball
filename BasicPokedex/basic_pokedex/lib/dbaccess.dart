@@ -171,4 +171,5 @@ class DatabaseAccess{
       output.add(PokemonListItem(result[i]['Number'] as int, result[i]['Name'] as String, result[i]['Form'] as String?));
     }
     return output;
+  }
 }
