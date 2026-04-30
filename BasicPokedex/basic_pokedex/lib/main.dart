@@ -4,6 +4,7 @@ import 'package:transparent_image/transparent_image.dart';
 import 'pokemon.dart';
 import 'detailedView.dart';
 import 'dbaccess.dart';
+import 'searchBar.dart';
 
 void main() {
   //Initialize Flutter binding before accessing image cache
@@ -27,6 +28,7 @@ class _MainAppState extends State<MainApp> {
   Pokemon? currentPokemon;
   final int pokemonCount = 1025;
   final ScrollController _controller = ScrollController();
+  final SearchController _searchController = SearchController();
 
   @override
   Widget build(BuildContext context) {
