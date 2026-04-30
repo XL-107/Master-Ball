@@ -45,6 +45,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
         builder: (BuildContext context, SearchController controller) {
           return SearchBar(
             controller: widget.controller,
+            backgroundColor: WidgetStatePropertyAll<Color>(Color.fromARGB(255, 110, 8, 185)),
             padding: const WidgetStatePropertyAll<EdgeInsets>(
               EdgeInsets.symmetric(horizontal: 16.0),
             ),
