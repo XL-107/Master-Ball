@@ -79,3 +79,15 @@ class Move {
 
   Move(this.name, this.description, this.power, this.accuracy, this.catagory, this.type);
 }
+
+class PokemonListItem {
+  int number;
+  String name;
+  String? form;
+
+  PokemonListItem(this.number, this.name, this.form);
+
+  String getNameWithForm(){
+    return name + ((form == null || form == "") ? "" : ": $form");
+  }
+}

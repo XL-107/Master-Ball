@@ -162,4 +162,13 @@ class DatabaseAccess{
 
     return loaded[loaded.length-1];
   }
+
+  Future<List<PokemonListItem>> getPokemonList() async{ //returns a list of all pokemon in the database, but only with their number, name, and form, for use in the search function
+    final db = await initDB();
+    final result = await db.query('expanded_pokemon_test', columns: ['Number', 'Name', 'Form']);
+    List<PokemonListItem> output = [];
+    for (int i=0; i<result.length; i++){
+      output.add(PokemonListItem(result[i]['Number'] as int, result[i]['Name'] as String, result[i]['Form'] as String?));
+    }
+    return output;
 }
