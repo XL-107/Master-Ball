@@ -43,21 +43,27 @@ class _SearchBarAppState extends State<SearchBarApp> {
       padding: const EdgeInsets.all(8.0),
       child: SearchAnchor(
         builder: (BuildContext context, SearchController controller) {
-          return SearchBar(
-            controller: widget.controller,
-            backgroundColor: WidgetStatePropertyAll<Color>(Color.fromARGB(255, 110, 8, 185)),
-            padding: const WidgetStatePropertyAll<EdgeInsets>(
-              EdgeInsets.symmetric(horizontal: 16.0),
+          return Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 110, 8, 185),
+              //borderRadius: BorderRadius.circular(40),
             ),
-            onTap: () {
-              controller.openView();
-            },
-            onChanged: (_) {
-              controller.openView();
-            },
-            leading: const Icon(Icons.search),
-            trailing: <Widget>[
-            ],
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
+            child: SearchBar(
+              controller: widget.controller,
+              padding: const WidgetStatePropertyAll<EdgeInsets>(
+                EdgeInsets.symmetric(horizontal: 16.0),
+              ),
+              onTap: () {
+                controller.openView();
+              },
+              onChanged: (_) {
+                controller.openView();
+              },
+              leading: const Icon(Icons.search),
+              trailing: <Widget>[
+              ],
+            ),
           );
         },
         suggestionsBuilder:
