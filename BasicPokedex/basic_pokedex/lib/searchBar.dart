@@ -50,9 +50,10 @@ class _SearchBarAppState extends State<SearchBarApp> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
             child: SearchBar(
+              hintText: 'Search for Pokemon',
               controller: widget.controller,
               padding: const WidgetStatePropertyAll<EdgeInsets>(
-                EdgeInsets.symmetric(horizontal: 16.0),
+                EdgeInsets.symmetric(horizontal: 20.0),
               ),
               onTap: () {
                 controller.openView();
