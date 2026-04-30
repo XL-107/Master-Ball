@@ -29,6 +29,20 @@ class _MainAppState extends State<MainApp> {
   final int pokemonCount = 1025;
   final ScrollController _controller = ScrollController();
   final SearchController _searchController = SearchController();
+  final List<PokemonListItem> _pokemonList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPokemonList();
+  }
+
+  Future<void> _loadPokemonList() async {
+    final list = await _db.getPokemonList();
+    setState(() {
+      _pokemonList.addAll(list);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,193 +75,209 @@ class _MainAppState extends State<MainApp> {
           centerTitle: true,
           backgroundColor: Color.fromARGB(255, 110, 8, 185),
         ),
-        body: Stack(
+        body: Column(
           children: [
-            if (currentPokemon != null)
-              Container(
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 110, 8, 185),
-                ),
-                child: DetailedView(pokemonEntry: currentPokemon!),
-              ),
-            if(currentPokemon == null) //when Currentpokemon is null uses containers to replicate grabbersheet look, but you can't drag grid down
-              Column(
+            SearchBarApp(
+              controller: _searchController,
+              pokemonList: _pokemonList,
+              onPokemonSelected: (index) async {
+                final pokemon = await _db.getPokemonAtIndex(index);
+                setState(() {
+                  currentPokemon = pokemon;
+                });
+              },
+            ),
+            Expanded(
+              child: Stack(
                 children: [
-                  Container(
-                    color: Colors.black,
-                    width: double.infinity,
-                    height: 30,
-                    child: Center(
-                      child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
+                  if (currentPokemon != null)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 110, 8, 185),
+                      ),
+                      child: DetailedView(pokemonEntry: currentPokemon!),
+                    ),
+                  if(currentPokemon == null) //when Currentpokemon is null uses containers to replicate grabbersheet look, but you can't drag grid down
+                    Column(
+                      children: [
+                        Container(
+                          color: Colors.black,
+                          width: double.infinity,
+                          height: 30,
+                          child: Center(
+                            child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
                           ),
                         ),
-                    ),
-                  ),
-                  Expanded(
-                    child: RawScrollbar(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: Colors.black,
-                          width: 2.0, 
-                        ),
-                      ),
-                      thumbColor: Color.fromARGB(255, 88, 125, 248),
-                      thumbVisibility: true,
-                      interactive: true,
-                      controller: _controller,
-                      thickness: 15.0,
-                      child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 5,
-                        ),
-                        controller: _controller,
-                        itemCount: pokemonCount,
-                        itemBuilder: (context, index) {
-                          final pokemonNumber = index + 1;
-                          return GestureDetector(
-                            onTap: () async {
-                              final pokemon = await _db.getPokemonAtIndex(index);
-                              setState(() {
-                                if(currentPokemon != pokemon){
-                                  currentPokemon = pokemon;
-                                }else{
-                                  currentPokemon = null;
-                                }
-                              });
-                            },
-                            child: Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 177, 67, 240),
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 1.0,
-                                    )
-                                  ),
-                                  child: FadeInImage.memoryNetwork(
-                                    placeholder: kTransparentImage,
-                                    image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
-                                    fit: BoxFit.contain,
-                                    filterQuality: FilterQuality.none,
-                                    fadeInDuration: Duration(milliseconds: 300),
-                                    fadeOutDuration: Duration(milliseconds: 100),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: Text(
-                                    pokemonNumber.toString().padLeft(4, '0'),
-                                    style: TextStyle(
-                                      fontFamily: 'PKMN RBYGSC',
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                        Expanded(
+                          child: RawScrollbar(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(
+                                color: Colors.black,
+                                width: 2.0, 
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            if(currentPokemon != null)
-              GrabberSheet( //makes gridView draggable to different heights in the screen (causes some annoying issues when on start or end of gridview)
-                snap: true,
-                initialChildSize: 0.65,
-                minChildSize: 0.25,
-                maxChildSize: 1.0,
-                backgroundColor: Colors.black,
-                borderRadius: BorderRadius.zero,
-                snapSizes: [0.25, 0.65, 1.0],
-                grabberStyle: GrabberStyle(
-                  width: 20,
-                  height: 20,
-                  color: Colors.white,
-                  radius: Radius.circular(10),
-                  margin: EdgeInsetsGeometry.all(5)
-                ),
-                builder: (context, scrollController) {
-                  return RawScrollbar(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(
-                        color: Colors.black,
-                        width: 2.0, 
-                      ),
-                    ),
-                    thumbColor: Color.fromARGB(255, 88, 125, 248),
-                    thumbVisibility: true,
-                    interactive: true,
-                    controller: scrollController,
-                    thickness: 15.0,
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 5,
-                      ),
-                      controller: scrollController,
-                      itemCount: pokemonCount,
-                      itemBuilder: (context, index) {
-                        final pokemonNumber = index + 1;
-                        return GestureDetector(
-                          onTap: () async {
-                            final pokemon = await _db.getPokemonAtIndex(index);
-                            setState(() {
-                              if(currentPokemon != pokemon){
-                                currentPokemon = pokemon;
-                              }else{
-                                currentPokemon = null;
-                                
-                              }
-                            });
-                          },
-                          child: Stack(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(255, 177, 67, 240),
-                                  border: Border.all(
-                                    color: Colors.black,
-                                    width: 1.0,
-                                  )
-                                ),
-                                child: FadeInImage.memoryNetwork(
-                                  placeholder: kTransparentImage,
-                                  image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
-                                  fit: BoxFit.contain,
-                                  filterQuality: FilterQuality.none,
-                                  fadeInDuration: Duration(milliseconds: 300),
-                                  fadeOutDuration: Duration(milliseconds: 100),
-                                ),
+                            thumbColor: Color.fromARGB(255, 88, 125, 248),
+                            thumbVisibility: true,
+                            interactive: true,
+                            controller: _controller,
+                            thickness: 15.0,
+                            child: GridView.builder(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 5,
                               ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: Text(
-                                  pokemonNumber.toString().padLeft(4, '0'),
-                                  style: TextStyle(
-                                    fontFamily: 'PKMN RBYGSC',
-                                    fontSize: 12,
+                              controller: _controller,
+                              itemCount: pokemonCount,
+                              itemBuilder: (context, index) {
+                                final pokemonNumber = index + 1;
+                                return GestureDetector(
+                                  onTap: () async {
+                                    final pokemon = await _db.getPokemonAtIndex(index);
+                                    setState(() {
+                                      if(currentPokemon != pokemon){
+                                        currentPokemon = pokemon;
+                                      }else{
+                                        currentPokemon = null;
+                                      }
+                                    });
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Color.fromARGB(255, 177, 67, 240),
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 1.0,
+                                          )
+                                        ),
+                                        child: FadeInImage.memoryNetwork(
+                                          placeholder: kTransparentImage,
+                                          image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
+                                          fit: BoxFit.contain,
+                                          filterQuality: FilterQuality.none,
+                                          fadeInDuration: Duration(milliseconds: 300),
+                                          fadeOutDuration: Duration(milliseconds: 100),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: Text(
+                                          pokemonNumber.toString().padLeft(4, '0'),
+                                          style: TextStyle(
+                                            fontFamily: 'PKMN RBYGSC',
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  if(currentPokemon != null)
+                    GrabberSheet( //makes gridView draggable to different heights in the screen (causes some annoying issues when on start or end of gridview)
+                      snap: true,
+                      initialChildSize: 0.65,
+                      minChildSize: 0.25,
+                      maxChildSize: 1.0,
+                      backgroundColor: Colors.black,
+                      borderRadius: BorderRadius.zero,
+                      snapSizes: [0.25, 0.65, 1.0],
+                      grabberStyle: GrabberStyle(
+                        width: 20,
+                        height: 20,
+                        color: Colors.white,
+                        radius: Radius.circular(10),
+                        margin: EdgeInsetsGeometry.all(5)
+                      ),
+                      builder: (context, scrollController) {
+                        return RawScrollbar(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                              color: Colors.black,
+                              width: 2.0, 
+                            ),
+                          ),
+                          thumbColor: Color.fromARGB(255, 88, 125, 248),
+                          thumbVisibility: true,
+                          interactive: true,
+                          controller: scrollController,
+                          thickness: 15.0,
+                          child: GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 5,
+                            ),
+                            controller: scrollController,
+                            itemCount: pokemonCount,
+                            itemBuilder: (context, index) {
+                              final pokemonNumber = index + 1;
+                              return GestureDetector(
+                                onTap: () async {
+                                  final pokemon = await _db.getPokemonAtIndex(index);
+                                  setState(() {
+                                    if(currentPokemon != pokemon){
+                                      currentPokemon = pokemon;
+                                    }else{
+                                      currentPokemon = null;
+                                      
+                                    }
+                                  });
+                                },
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Color.fromARGB(255, 177, 67, 240),
+                                        border: Border.all(
+                                          color: Colors.black,
+                                          width: 1.0,
+                                        )
+                                      ),
+                                      child: FadeInImage.memoryNetwork(
+                                        placeholder: kTransparentImage,
+                                        image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonNumber.png',
+                                        fit: BoxFit.contain,
+                                        filterQuality: FilterQuality.none,
+                                        fadeInDuration: Duration(milliseconds: 300),
+                                        fadeOutDuration: Duration(milliseconds: 100),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: Text(
+                                        pokemonNumber.toString().padLeft(4, '0'),
+                                        style: TextStyle(
+                                          fontFamily: 'PKMN RBYGSC',
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              );
+                            },
                           ),
                         );
                       },
                     ),
-                  );
-                },
+                ],
               ),
+            ),
           ],
         ),
       ),
